@@ -81,7 +81,7 @@ tornado==6.0.3
 Twisted==19.10.0
 txaio==18.8.1
 Unidecode==1.1.1
-urllib3==1.24.1
+urllib3==1.24.2
 vine==1.2.0
 vk-api==11.6.1
 Werkzeug==0.14.1
