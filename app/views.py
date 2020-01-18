@@ -87,7 +87,7 @@ class SignupView(FormView):
         user = User(email=form.cleaned_data['username'])
         user.set_password(form.cleaned_data['password1'])
         user.save()
-        messages.success('You have signed up successfully')
+        messages.success(self.request, 'You have signed up successfully')
         return redirect('login')
 
 
