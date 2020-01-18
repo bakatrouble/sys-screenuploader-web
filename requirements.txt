@@ -67,7 +67,7 @@ python-dateutil==2.7.5
 python-telegram-bot==12.2.0
 python-twitter==3.5
 pytz==2018.9
-PyYAML==3.13
+PyYAML==5.1
 redis==3.0.1
 requests==2.21.0
 requests-oauthlib==1.2.0
