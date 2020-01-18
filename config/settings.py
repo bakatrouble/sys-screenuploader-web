@@ -66,7 +66,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3'),
 }
-DATABASES['default']['ATOMIC_REQUESTS'] = True
+# DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Moscow'
