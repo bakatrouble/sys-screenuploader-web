@@ -1,0 +1,14 @@
+[Unit]
+Description=screenuploader celeryd service
+After=network.target
+
+[Service]
+Type=simple
+User=http
+Group=http
+WorkingDirectory=/srv/apps/screenuploader
+ExecStart=/srv/apps/screenuploader/venv/bin/celery worker --app=config -l info
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,55 @@
+{% extends '_base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Destination list{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <section class="card">
+            <header class="card-header">
+                <div class="card-button-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                            Add new destination
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% for module in modules %}
+                                <a class="dropdown-item"
+                                   href="{% url 'destination_new' content_type=module.content_type.model %}">{{ module.MODULE_NAME }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <h2 class="card-title">Destination list</h2>
+            </header>
+            <div class="card-body">
+                <table class="table table-hover table-responsive-md mb-0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Module</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    {% for destination in object_list %}
+                    <tr>
+                        <td>{{ destination.pk }}</td>
+                        <td>{{ destination.title }}</td>
+                        <td>{{ destination.config.MODULE_NAME }}</td>
+                        <td><a href="{% url 'destination_edit' pk=destination.pk %}">Configure</a></td>
+                        <td><a href="{% url 'destination_history' pk=destination.pk %}">History</a></td>
+                    </tr>
+                    {% empty %}
+                    <tfoot>
+                    <tr>
+                        <td colspan="5">No destinations added</td>
+                    </tr>
+                    </tfoot>
+                    {% endfor %}
+                </table>
+            </div>
+        </section>
+    </div>
+{% endblock %}

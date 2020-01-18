@@ -1,0 +1,18 @@
+.card-button-actions {
+    right: 15px;
+    position: absolute;
+    top: 12px;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 30px;
+    padding: 0;
+    text-transform: none;
+    margin: 0;
+}
+
+hr {
+    background-color: #222;
+}

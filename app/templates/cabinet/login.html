@@ -1,0 +1,44 @@
+{% extends '_base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card">
+                    <article class="card-body">
+                        <h5 class="card-title text-center">Login</h5>
+                        <hr>
+                        {% bootstrap_form_errors form %}
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-primary"><i class="fa fa-envelope"></i></span>
+                                    </div>
+                                    <input class="form-control" name="username" placeholder="E-mail" type="email" required>
+                                </div> <!-- input-group.// -->
+                            </div> <!-- form-group// -->
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-primary"><i class="fa fa-lock"></i></span>
+                                    </div>
+                                    <input class="form-control" name="password" placeholder="Password" type="password" required>
+                                </div> <!-- input-group.// -->
+                            </div> <!-- form-group// -->
+                            <label class="d-block"><input type="checkbox" name="remember"> Remember me</label>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                            </div> <!-- form-group// -->
+                            <p class="text-center"><a href="{% url 'signup' %}">Signup</a></p>
+                        </form>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

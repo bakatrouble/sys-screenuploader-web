@@ -1,0 +1,15 @@
+[Unit]
+Description=screenuploader main service
+After=network.target
+Requires=screenuploader-celeryd.service
+
+[Service]
+Type=simple
+User=http
+Group=http
+WorkingDirectory=/srv/apps/screenuploader
+ExecStart=/srv/apps/screenuploader/venv/bin/daphne -u /tmp/screenuploader.sock config.asgi:application
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

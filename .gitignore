@@ -1,0 +1,8 @@
+.env
+db.sqlite3
+logs/*
+*.py[co]
+__pycache__
+!.gitkeep
+.idea
+build

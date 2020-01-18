@@ -1,0 +1,55 @@
+{% extends '_base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}Destination "{{ object.title }}" history{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <section class="card">
+            <header class="card-header">
+                <h2 class="card-title">Destination "{{ object.title }}" history</h2>
+            </header>
+            <div class="card-body">
+                <table class="table table-hover table-responsive-md mb-2">
+                    <thead>
+                    <tr>
+                        <th>Datetime</th>
+                        <th>Filename</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    {% for media in object_list %}
+                    <tr>
+                        <td>{{ media.datetime }}</td>
+                        <td>{{ media.file.name }}</td>
+                        <td>
+                            {% if media.status is None %}
+                                processing
+                            {% elif media.status is True %}
+                                success
+                            {% else %}
+                                error
+                                <span class="fa fa-question-circle" data-toggle="popover"
+                                      data-placement="left" data-content="{{ media.log }}" tabindex="0"></span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tfoot>
+                    <tr>
+                        <td colspan="3">Nothing to show</td>
+                    </tr>
+                    </tfoot>
+                    {% endfor %}
+                </table>
+                {% bootstrap_pagination page_obj %}
+            </div>
+        </section>
+    </div>
+{% endblock %}
+
+{% block body_extra %}
+    <script>
+        $('[data-toggle="popover"]').popover();
+    </script>
+{% endblock %}

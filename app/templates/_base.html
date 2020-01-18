@@ -1,0 +1,72 @@
+{% load static bootstrap4 %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - sys-screenuploader</title>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/cyborg.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/font-awesome/css/fontawesome-all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/magnific-popup/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'app.css' %}">
+
+    <script src="{% static 'vendor/modernizr/modernizr.js' %}"></script>
+    <script src="{% static 'vendor/turbolinks/turbolinks.js' %}"></script>
+    {% block head_extra %}{% endblock %}
+</head>
+<body {% if not is_turbolinks %}loading-overlay-showing{% endif %}>
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">sys-screenuploader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="fa fa-bars"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'destination_list' %}">Destination list</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Signup</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    {% bootstrap_messages %}
+</div>
+{% block body %}{% endblock %}
+<div class="container text-right text-muted mt-1">
+    &copy;&nbsp;bakatrouble&nbsp;2020 |
+    <a href="https://gbatemp.net/threads/sys-screenuploader-a-handy-screen-capture-extractor.556519/" target="_blank">GBAtemp&nbsp;thread</a>
+</div>
+<div class="container text-right text-muted mt-1">
+    <a href="https://t.me/bakatrouble" target="_blank">Telegram</a> |
+    <a href="https://github.com/bakatrouble/sys-screenuploader" target="_blank">GitHub</a> |
+    Discord: <a href="https://discordapp.com/users/239822072115625984" target="_blank">bakatrouble#6275</a>
+</div>
+<div class="container text-right text-muted mt-1">
+    Media uploaded: {{ media_count }}
+</div>
+<script data-turbolinks-eval="false" src="{% static 'vendor/jquery/jquery.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/popper/umd/popper.min.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/bootstrap/js/bootstrap.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/magnific-popup/jquery.magnific-popup.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'app.js' %}"></script>
+<script src="{% static 'app.init.js' %}"></script>
+{% block body_extra %}{% endblock %}
+</body>
+</html>

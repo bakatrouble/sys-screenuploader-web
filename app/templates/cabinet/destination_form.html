@@ -1,0 +1,58 @@
+{% extends '_base.html' %}
+{% load bootstrap4 %}
+
+{% block title %}{% if destination %}Destination "{{ destination.title }}" configuration{% else %}New destination{% endif %}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <form action="" method="post" class="card" enctype="multipart/form-data">
+            {% csrf_token %}
+            <header class="card-header">
+                <h2 class="card-title">
+                    {% if destination %}Destination "{{ destination.title }}" configuration{% else %}New destination{% endif %}
+                    (module: {{ module.MODULE_NAME }})
+                </h2>
+            </header>
+            <div class="card-body">
+                <h4>General options</h4>
+                {% bootstrap_form destination_form layout='horizontal' %}
+                <hr>
+                <h4>Module options</h4>
+                {% bootstrap_form config_form layout='horizontal' %}
+            </div>
+            <footer class="card-footer text-right">
+                {% if destination %}<a href="#delete-modal" class="modal-basic btn btn-danger">Delete</a>{% endif %}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </footer>
+        </form>
+
+        {% if destination %}
+            <div id="delete-modal" class="modal-block modal-full-color modal-block-danger mfp-hide">
+                <div class="container">
+                    <section class="card">
+                        <header class="card-header">
+                            <h2 class="card-title">Delete destination "{{ destination.title }}"</h2>
+                        </header>
+                        <div class="card-body">
+                            <div class="modal-wrapper">
+                                <div class="modal-text">
+                                    <h4>Are you sure?</h4>
+                                    <p>This action cannot be undone.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <div class="row">
+                                <form action="{% url 'destination_delete' pk=destination.pk %}" method="post" class="col-md-12 text-right">
+                                    {% csrf_token %}
+                                    <button type="button" class="btn btn-outline-light modal-dismiss">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </footer>
+                    </section>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
