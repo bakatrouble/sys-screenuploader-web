@@ -16,6 +16,8 @@ cryptography==2.8
 daphne==2.4.1
 decorator==4.4.1
 Django==3.0.2
+django-admin-actions==0.1.1
+django-admin-easy==0.5.1
 django-bootstrap4==1.1.1
 django-environ==0.4.5
 -e git+https://github.com/JBKahn/django-jsonview@23f1f02fd16f49ff057de3c5b604ac785410a553#egg=django_jsonview

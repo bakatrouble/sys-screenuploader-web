@@ -18,6 +18,7 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
 REDIS_URL = env.str('REDIS_URL', 'redis://localhost:6379/4')
 
 INSTALLED_APPS = [
+    'admin_actions',
     'bootstrap4',
 
     'django.contrib.admin',

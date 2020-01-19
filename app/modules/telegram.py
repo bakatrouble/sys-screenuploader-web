@@ -9,7 +9,7 @@ from telegram import Bot
 from app.models import DestinationModuleConfig, UploadedMedia
 
 
-class TelegramDestinationModuleConfig(DestinationModuleConfig):
+class DestinationModuleConfigTelegram(DestinationModuleConfig):
     bot_token = models.CharField(max_length=64)
     chat_id = models.CharField(max_length=32)
 
@@ -29,3 +29,6 @@ class TelegramDestinationModuleConfig(DestinationModuleConfig):
                                thumb=media.thumb.open('rb'), timeout=60)
         else:
             bot.send_photo(self.chat_id, media_file)
+
+    class Meta:
+        verbose_name = verbose_name_plural = 'Destination module config Telegram'

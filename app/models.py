@@ -15,6 +15,9 @@ class Destination(models.Model):
     config_id = models.PositiveIntegerField()
     config = GenericForeignKey('config_type', 'config_id')
 
+    def __str__(self):
+        return self.title
+
 
 class DestinationModuleConfig(models.Model):
     _destination = GenericRelation(Destination, content_type_field='config_type', object_id_field='config_id')
@@ -31,6 +34,9 @@ class DestinationModuleConfig(models.Model):
 
     def send_media(self, media: 'UploadedMedia'):
         raise NotImplementedError()
+
+    def __str__(self):
+        return f'{self.destination.title} (module {self.MODULE_NAME})'
 
     class Meta:
         abstract = True
