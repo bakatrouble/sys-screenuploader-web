@@ -9,11 +9,22 @@ from telegram import Bot
 from app.models import DestinationModuleConfig, UploadedMedia
 
 
+HELP_TEXT = '''\
+<ul>
+    <li>Create a bot using @botfather, you will get its <b>token</b></li>
+    <li>Create a channel, add your bot to it as admin</li>
+    <li>Send a message to the channel and forward it to @userinfobot, you will get your <b>chat ID</b> (minus sign for
+        private channels included)</li>
+</ul>
+'''
+
+
 class DestinationModuleConfigTelegram(DestinationModuleConfig):
     bot_token = models.CharField(max_length=64)
     chat_id = models.CharField(max_length=32)
 
     MODULE_NAME = 'Telegram'
+    HELP_TEXT = HELP_TEXT
 
     def send_media(self, media: UploadedMedia):
         media_file = media.file.open('rb') if settings.DEBUG else media.file.url
