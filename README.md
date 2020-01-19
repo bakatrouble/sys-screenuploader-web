@@ -1,3 +1,3 @@
 # sys-screenuploader-web
 
-See [http://screenuploader.bakatrouble.me](http://screenuploader.bakatrouble.me)
+See [https://screenuploader.bakatrouble.me](https://screenuploader.bakatrouble.me)
