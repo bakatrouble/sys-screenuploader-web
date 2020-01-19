@@ -11,9 +11,9 @@ from app.models import DestinationModuleConfig, UploadedMedia
 
 HELP_TEXT = '''\
 <ul>
-    <li>Create a bot using @botfather, you will get its <b>token</b></li>
+    <li>Create a bot using <a href="https://t.me/botfather" target="_blank">@botfather</a>, you will get its <b>token</b></li>
     <li>Create a channel, add your bot to it as admin</li>
-    <li>Send a message to the channel and forward it to @userinfobot, you will get your <b>chat ID</b> (minus sign for
+    <li>Send a message to the channel and forward it to <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>, you will get your <b>chat ID</b> (minus sign for
         private channels included)</li>
 </ul>
 '''
