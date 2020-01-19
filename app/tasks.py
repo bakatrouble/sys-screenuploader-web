@@ -15,7 +15,7 @@ def process_upload(media_id: int):
         media.status = True
     except Exception as e:
         media.status = False
-        media.log = repr(e)
+        media.log = repr(e) + ': ' + str(e)
         traceback.print_exc()
 
     media.save()
