@@ -58,11 +58,16 @@ class DestinationAdmin(FixedAMA):
 
 
 @admin.register(UploadedMedia)
-class UploadedMediaAdmin(admin.ModelAdmin):
+class UploadedMediaAdmin(FixedAMA):
     list_display = 'filename', 'is_video', 'destination_', 'owner_', 'datetime', 'status',
     list_filter = 'destination', 'destination__owner', 'is_video', 'status',
     date_hierarchy = 'datetime'
+    actions_row = actions_detail = 'file_link',
 
     filename = easy.SimpleAdminField('file.name')
     destination_ = easy.ForeignKeyAdminField('destination')
     owner_ = easy.ForeignKeyAdminField('destination.owner')
+
+    def file_link(self, request, pk):
+        obj = UploadedMedia.objects.get(pk=pk)
+        return redirect(obj.file.url)
