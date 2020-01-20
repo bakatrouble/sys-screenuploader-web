@@ -7,11 +7,11 @@
         <h1>sys-screenuploader</h1>
 
         <p>
-        This is a forwarding service for <a href="https://github.com/bakatrouble/sys-screenuploader" target="_blank">sys-screenuploader</a>.
+            This is a forwarding service for <a href="https://github.com/bakatrouble/sys-screenuploader" target="_blank">sys-screenuploader</a>.
         </p>
 
         <p>
-        <code>sys-screenuploader</code> is a sysmodule which monitors <code>/Nintendo/Album</code> directory on your SD card for new files and uploads them to this website for further processing.
+            <code>sys-screenuploader</code> is a sysmodule which monitors <code>/Nintendo/Album</code> directory on your SD card for new files and uploads them to this website for further processing.
         </p>
 
         <hr>
@@ -21,17 +21,29 @@
             <li>Telegram</li>
         </ul>
 
-        <p>Feel free to request new modules and send other feature requests/proposals/bugreports (contacts below)</p>
+        <p>
+            Feel free to request new modules and send other feature requests/proposals/bugreports (contacts below)
+        </p>
 
         <hr>
 
         <h4>Installation</h4>
         <p>
-        Download latest <a href="https://github.com/bakatrouble/sys-screenuploader/releases/latest" target="_blank">sys-screenuploader.zip</a>
-        and extract it to SD card root.
+            Download latest <a href="https://github.com/bakatrouble/sys-screenuploader/releases/latest" target="_blank">sys-screenuploader.zip</a>
+            and extract it to SD card root.
         </p>
         <p>
-        Signup on this website, create a destination and put its ID (visible on the destination list page) to <code>/config/sys-screenuploader/config.ini</code>
+            SX OS users: move <code>42000062616B6101</code> directory from <code>/atmosphere/contents</code> to <code>/sxos/titles</code>
         </p>
+        <p>
+            Signup on this website, create a destination and put its ID (visible on the destination list page) to <code>/config/sys-screenuploader/config.ini</code>
+        </p>
+        <p>
+            For logs see <code>/config/sys-screenuploader/screenuploader.log</code>
+        </p>
+        <p>
+            If your album path was detected incorrectly (visible in logs), uncomment <code>album_path</code> option in config file and change its value to correct one
+        </p>
+
     </div>
 {% endblock %}
