@@ -127,6 +127,8 @@ if not DEBUG:
     AWS_S3_REGION_NAME = 'eu-west-3'
     AWS_DEFAULT_ACL = 'public-read'
 
+DISCORD_BOT_TOKEN = env.str('DISCORD_BOT_TOKEN')
+
 sentry_sdk.init(
     dsn=env.str('SENTRY_DSN', None),
     integrations=[DjangoIntegration()],

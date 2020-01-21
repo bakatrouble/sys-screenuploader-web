@@ -1,3 +1,4 @@
-from app.modules.telegram import DestinationModuleConfigTelegram
+from .telegram import DestinationModuleConfigTelegram
+from .discord import DestinationModuleConfigDiscord
 
-DESTINATION_MODULES = [DestinationModuleConfigTelegram]
+DESTINATION_MODULES = [DestinationModuleConfigTelegram, DestinationModuleConfigDiscord]

@@ -1,5 +1,7 @@
+aiohttp==3.5.4
 amqp==2.5.2
 asgiref==3.2.3
+async-timeout==3.0.1
 attrs==19.3.0
 autobahn==20.1.2
 Automat==0.8.0
@@ -15,6 +17,7 @@ constantly==15.1.0
 cryptography==2.8
 daphne==2.4.1
 decorator==4.4.1
+discord.py==1.2.5
 Django==3.0.2
 django-admin-actions==0.1.1
 django-admin-easy==0.5.1
@@ -33,6 +36,7 @@ incremental==17.5.0
 jmespath==0.9.4
 kombu==4.6.7
 moviepy==1.0.1
+multidict==4.7.4
 numpy==1.18.1
 Pillow==7.0.0
 proglog==0.1.9
@@ -59,4 +63,6 @@ Twisted==19.10.0
 txaio==18.8.1
 urllib3==1.25.7
 vine==1.3.0
+websockets==6.0
+yarl==1.4.2
 zope.interface==4.7.1
