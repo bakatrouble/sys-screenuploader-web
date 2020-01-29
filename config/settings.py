@@ -135,8 +135,6 @@ GFYCAT_SECRET = env.str('GFYCAT_SECRET')
 STREAMABLE_EMAIL = env.str('STREAMABLE_EMAIL')
 STREAMABLE_PASSWORD = env.str('STREAMABLE_PASSWORD')
 
-S_UL_API_KEY = env.str('S_UL_API_KEY')
-
 sentry_sdk.init(
     dsn=env.str('SENTRY_DSN', None),
     integrations=[DjangoIntegration()],
