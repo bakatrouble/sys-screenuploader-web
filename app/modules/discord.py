@@ -54,4 +54,4 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
                 raise RuntimeError(r.text)
 
     class Meta:
-        verbose_name = verbose_name_plural = 'Destination module config Telegram'
+        verbose_name = verbose_name_plural = 'Destination module config Discord'
