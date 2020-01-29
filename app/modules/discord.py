@@ -1,7 +1,10 @@
+import json
+
 import requests
 from django.conf import settings
 from django.db import models
 
+from app.file_upload import uploader_options, uploaders
 from app.models import DestinationModuleConfig, UploadedMedia
 
 
@@ -17,10 +20,6 @@ HELP_TEXT = '''\
     <li>Add bot to the server using <a href="https://discordapp.com/api/oauth2/authorize?client_id=668958356450312192&permissions=0&scope=bot" target="_blank">this link</a></li>
     <li>Use channel ID that you can obtain from Discord interface</li>
 </ul>
-
-<div class="alert alert-danger">
-    Video sending is not supported due to 8 MB file upload limit in Discord. If you know any suitable short clip hosting with API, please ping me.
-</div> 
 '''
 
 
@@ -32,15 +31,23 @@ def get_api_session():
 
 class DestinationModuleConfigDiscord(DestinationModuleConfig):
     channel_id = models.CharField(max_length=32)
+    uploader = models.CharField(max_length=32, default='streamable', choices=uploader_options)
 
     MODULE_NAME = 'Discord'
     HELP_TEXT = HELP_TEXT
+
+    def get_uploader(self):
+        return uploaders[self.uploader]
 
     def send_media(self, media: UploadedMedia):
         url = 'https://discordapp.com/api/v6/channels/{}/messages'.format(self.channel_id)
 
         if media.is_video:
-            raise NotImplementedError('Videos are not supported for Discord')
+            upload_url = self.get_uploader().upload(media)
+            r = get_api_session().post(url, {'payload_json': json.dumps({'content': upload_url})},
+                                       files={'file': media.thumb.open('rb')})
+            if r.status_code != 200:
+                raise RuntimeError(r.text)
         else:
             r = get_api_session().post(url, files={'file': media.file})
             if r.status_code != 200:
