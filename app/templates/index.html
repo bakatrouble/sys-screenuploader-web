@@ -37,13 +37,17 @@
             SX OS users: move <code>42000062616B6101</code> directory from <code>/atmosphere/contents</code> to <code>/sxos/titles</code>
         </p>
         <p>
-            Signup on this website, create a destination and put its ID (visible on the destination list page) to <code>/config/sys-screenuploader/config.ini</code>
+            Signup on this website, create a destination and put its ID (visible on the destination list page) to <code>/config/sys-screenuploader/config.ini</code> under <code>destinations</code> section
+            (you may replace <code>default</code> destination value or create a new one and set <code>default_destination</code> value under the <code>server</code> section to its name)
+        </p>
+        <p>
+            If you want to use different destinations for some titles, add values under <code>title_settings</code> section following the example
+        </p>
+        <p>
+            Configuration UI is TBD
         </p>
         <p>
             For logs see <code>/config/sys-screenuploader/screenuploader.log</code>
-        </p>
-        <p>
-            If your album path was detected incorrectly (visible in logs), uncomment <code>album_path</code> option in config file and change its value to correct one
         </p>
 
     </div>
