@@ -19,9 +19,8 @@ class StreamableUploader(Uploader):
                 auth=HTTPBasicAuth(settings.STREAMABLE_EMAIL, settings.STREAMABLE_PASSWORD)
             ).json()
         else:
-            upload_data = requests.post(
-                'https://api.streamable.com/import',
-                params={'url': media.file.url},
-                auth=HTTPBasicAuth(settings.STREAMABLE_EMAIL, settings.STREAMABLE_PASSWORD)
-            ).json()
+            r = requests.post('https://api.streamable.com/import', params={'url': media.file.url},
+                              auth=HTTPBasicAuth(settings.STREAMABLE_EMAIL, settings.STREAMABLE_PASSWORD))
+            print(r.text)
+            upload_data = r.json()
         return f'https://streamable.com/{upload_data["shortcode"]}'
