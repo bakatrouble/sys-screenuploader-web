@@ -49,7 +49,7 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
             if r.status_code != 200:
                 raise RuntimeError(r.text)
         else:
-            r = get_api_session().post(url, files={'file': media.file})
+            r = get_api_session().post(url, files={'file': media.file.open('rb')})
             if r.status_code != 200:
                 raise RuntimeError(r.text)
 
