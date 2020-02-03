@@ -1,6 +1,7 @@
 import os
 from tempfile import TemporaryDirectory
 
+from PIL import Image
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
@@ -43,7 +44,8 @@ class UploadView(JsonView):
             return {'status': 'error', 'message': 'wrong destination id'}, 404
 
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video)
-        uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
+        file = SimpleUploadedFile(filename, request.body, mime)
+        uploaded_media.file.save(filename, file, save=False)
 
         if is_video:
             with TemporaryDirectory() as d:
@@ -53,13 +55,24 @@ class UploadView(JsonView):
                 thumb_name = filename + '.thumb.jpg'
                 thumb = os.path.join(d, thumb_name)
                 clip = VideoFileClip(fpath)
+                if clip.size != [1280, 720]:
+                    clip.close()
+                    return {'status': 'error', 'message': 'invalid video file'}
                 clip.save_frame(thumb, t=1)
                 uploaded_media.video_length = clip.duration
                 uploaded_media.video_width = clip.size[0]
                 uploaded_media.video_height = clip.size[1]
+                clip.close()
                 with open(thumb, 'rb') as f:
                     uploaded_media.thumb.save(thumb_name,
                                               SimpleUploadedFile(thumb_name, f.read(), 'image/jpeg'), save=False)
+        else:
+            try:
+                im = Image.open(file)  # type: Image.Image
+                if im.format != 'JPEG':
+                    raise IOError()
+            except IOError:
+                return {'status': 'error', 'message': 'invalid image file'}
 
         uploaded_media.save()
         process_upload.apply_async(args=(uploaded_media.pk,), shadow=str(uploaded_media))
