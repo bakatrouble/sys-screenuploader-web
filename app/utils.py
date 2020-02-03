@@ -1,3 +1,4 @@
+from django.db import models
 from django.forms import ModelForm
 from django.views.generic import TemplateView
 
@@ -5,9 +6,14 @@ from app.forms import DestinationForm
 from app.models import Destination
 
 
-def get_config_form(mdl):
+def get_config_form(mdl: models.Model):
     class ConfigForm(ModelForm):
         prefix = 'config'
+
+        def __init__(self, *args, request, ct, **kwargs):
+            super().__init__(*args, **kwargs)
+            if hasattr(mdl, 'INIT_HOOK'):
+                mdl.INIT_HOOK(self, *args, request=request, ct=ct, **kwargs)
 
         class Meta:
             model = mdl
@@ -40,9 +46,10 @@ class BaseDestinationView(TemplateView):
         destination = self.get_object()
         data = self.request.POST if self.request.method == 'POST' else None
         files = self.request.FILES if self.request.method == 'POST' else None
+        ct = self.get_content_type()
         return DestinationForm(data=data, files=files, instance=destination), \
-               get_config_form(self.get_content_type().model_class())(data=data, files=files,
-                                                                      instance=destination.config if destination else None)
+               get_config_form(ct.model_class())(data=data, files=files, request=self.request, ct=ct,
+                                                 instance=destination.config if destination else None)
 
     def get_context_data(self, forms=None, **kwargs):
         ctx = super().get_context_data(**kwargs)

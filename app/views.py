@@ -2,16 +2,15 @@ import os
 from tempfile import TemporaryDirectory
 
 from django.contrib import messages
-from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect, Http404
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import FormView, ListView
-from django.views.generic.detail import SingleObjectMixin, DetailView
+from django.views.generic.detail import SingleObjectMixin
 from jsonview.views import JsonView
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
@@ -25,7 +24,7 @@ from .utils import BaseDestinationView
 
 class UploadView(JsonView):
     def post(self, request: HttpRequest, *args, **kwargs):
-        filename = request.GET.get('filename')
+        filename = self.request.GET.get('filename')
         if not filename:
             return {'status': 'error', 'message': 'filename is missing'}, 400
 
@@ -95,7 +94,7 @@ class DestinationListView(LoginRequiredMixin, ListView):
     template_name = 'cabinet/destination_list.html'
 
     def get_queryset(self):
-        return self.request.user.destinations.all()
+        return Destination.get_user_destinations(self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         ctx = super().get_context_data(*args, **kwargs)
@@ -108,7 +107,10 @@ class DestinationHistoryView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_object(self):
-        return get_object_or_404(Destination, owner=self.request.user, pk=self.kwargs['pk'])
+        try:
+            return Destination.get_user_destinations(self.request.user).get(pk=self.kwargs['pk'])
+        except Destination.DoesNotExist:
+            raise Http404('Destination does not exist')
 
     def get_queryset(self):
         return self.get_object().media.order_by('-datetime')
@@ -120,6 +122,9 @@ class DestinationHistoryView(LoginRequiredMixin, ListView):
 
 
 class DestinationEditView(LoginRequiredMixin, BaseDestinationView, SingleObjectMixin):
+    def get_queryset(self):
+        return Destination.objects.filter(owner=self.request.user)
+
     def form_valid(self, destination_form, config_form):
         destination_form.save()
         config_form.save()

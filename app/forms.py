@@ -25,4 +25,4 @@ class DestinationForm(ModelForm):
 
     class Meta:
         model = Destination
-        exclude = 'id', 'owner', 'config_type', 'config_id',
+        exclude = 'id', 'owner', 'config_type', 'config_id', 'shared',

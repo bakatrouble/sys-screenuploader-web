@@ -4,16 +4,22 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Q
 
 
 class Destination(models.Model):
     id = models.UUIDField(default=uuid4, primary_key=True, unique=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='destinations')
     title = models.CharField(max_length=128)
+    shared = models.BooleanField(default=False)
 
     config_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     config_id = models.PositiveIntegerField()
     config = GenericForeignKey('config_type', 'config_id')
+
+    @staticmethod
+    def get_user_destinations(user):
+        return Destination.objects.filter(Q(owner=user) | Q(shared=True))
 
     def __str__(self):
         return self.title

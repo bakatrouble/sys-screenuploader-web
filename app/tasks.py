@@ -1,6 +1,8 @@
 import logging
 import traceback
 
+import sentry_sdk
+
 from app.models import UploadedMedia
 from config.celery import app
 
@@ -17,5 +19,6 @@ def process_upload(media_id: int):
         media.status = False
         media.log = repr(e) + ': ' + str(e)
         traceback.print_exc()
+        sentry_sdk.capture_exception()
 
     media.save()

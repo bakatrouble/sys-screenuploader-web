@@ -38,7 +38,11 @@
                         <td>{{ destination.pk }}</td>
                         <td>{{ destination.title }}</td>
                         <td>{{ destination.config.MODULE_NAME }}</td>
-                        <td><a href="{% url 'destination_edit' pk=destination.pk %}">Configure</a></td>
+                        <td>
+                            {% if destination.owner == request.user %}
+                                <a href="{% url 'destination_edit' pk=destination.pk %}">Configure</a>
+                            {% endif %}
+                        </td>
                         <td><a href="{% url 'destination_history' pk=destination.pk %}">History</a></td>
                     </tr>
                     {% empty %}
