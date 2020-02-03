@@ -68,7 +68,7 @@ class UploadView(JsonView):
                                               SimpleUploadedFile(thumb_name, f.read(), 'image/jpeg'), save=False)
         else:
             try:
-                im = Image.open(file)  # type: Image.Image
+                im = Image.open(file.open('rb'))  # type: Image.Image
                 if im.format != 'JPEG':
                     raise IOError()
             except IOError:
