@@ -41,6 +41,8 @@
                         <td>
                             {% if destination.owner == request.user %}
                                 <a href="{% url 'destination_edit' pk=destination.pk %}">Configure</a>
+                            {% else %}
+                                Shared
                             {% endif %}
                         </td>
                         <td><a href="{% url 'destination_history' pk=destination.pk %}">History</a></td>
