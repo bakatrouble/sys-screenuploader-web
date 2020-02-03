@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 from tempfile import TemporaryDirectory
 
 from PIL import Image
@@ -44,8 +45,7 @@ class UploadView(JsonView):
             return {'status': 'error', 'message': 'wrong destination id'}, 404
 
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video)
-        file = SimpleUploadedFile(filename, request.body, mime)
-        uploaded_media.file.save(filename, file, save=False)
+        uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
         if is_video:
             with TemporaryDirectory() as d:
@@ -68,7 +68,10 @@ class UploadView(JsonView):
                                               SimpleUploadedFile(thumb_name, f.read(), 'image/jpeg'), save=False)
         else:
             try:
-                im = Image.open(file.open('rb'))  # type: Image.Image
+                imf = BytesIO(request.body)
+                imf.name = 'im.jpg'
+                imf.seek(0)
+                im = Image.open(imf)  # type: Image.Image
                 if im.format != 'JPEG':
                     raise IOError()
             except IOError:
