@@ -1,4 +1,5 @@
 import traceback
+from time import sleep
 
 import sentry_sdk
 from django.db import models
@@ -31,6 +32,7 @@ class DestinationModuleConfigGroup(DestinationModuleConfig):
                 errors.append(f'Destination {dest} | {e!r}: {e!s}')
                 traceback.print_exc()
                 sentry_sdk.capture_exception()
+            sleep(1)
         if errors:
             if len(errors) != self.destinations.count():
                 errors = ['Partial', ''] + errors
