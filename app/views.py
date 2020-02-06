@@ -40,7 +40,12 @@ class UploadView(JsonView):
             return {'status': 'error', 'message': 'incorrect file extension'}, 400
 
         try:
-            destination = Destination.objects.get(pk=self.kwargs['destination_id'])
+            if self.kwargs['destination_id'] == 'undefined':
+                destination = Destination.objects.filter(shared=True).first()
+                if not destination:
+                    raise Destination.DoesNotExist
+            else:
+                destination = Destination.objects.get(pk=self.kwargs['destination_id'])
         except Destination.DoesNotExist:
             return {'status': 'error', 'message': 'wrong destination id'}, 404
 
