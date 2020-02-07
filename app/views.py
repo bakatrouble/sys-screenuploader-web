@@ -1,3 +1,4 @@
+import json
 import os
 from io import BytesIO
 from tempfile import TemporaryDirectory
@@ -10,14 +11,15 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponseRedirect, Http404
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.shortcuts import redirect, get_object_or_404
+from django.utils.text import slugify
 from django.views import View
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, TemplateView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
 from jsonview.views import JsonView
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from users.models import User
-from .forms import LoginForm, SignupForm
+from .forms import LoginForm, SignupForm, ConfigForm
 from .models import Destination, UploadedMedia
 from .modules import DESTINATION_MODULES
 from .tasks import process_upload
@@ -182,3 +184,33 @@ class DestinationDeleteView(LoginRequiredMixin, SingleObjectMixin, View):
         messages.success(self.request, 'Destination "{}" was successfully deleted'.format(destination.title))
         destination.delete()
         return redirect('destination_list')
+
+
+class ConfigurationView(LoginRequiredMixin, UpdateView):
+    template_name = 'cabinet/configuration.html'
+    form_class = ConfigForm
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        destinations = {}
+        for destination in Destination.get_user_destinations(self.request.user):
+            slug = slugify(destination.title)
+            if slug in destinations:
+                suffix = 2
+                while f'{slug}{suffix}' in destinations:
+                    suffix += 1
+                slug = f'{slug}{suffix}'
+            destinations[str(destination.pk)] = {'slug': slug, 'title': destination.title}
+
+        ctx['destinations'] = json.dumps(destinations)
+        default_destination = Destination.objects.filter(shared=True).first()
+        ctx['default_destination'] = json.dumps(str(default_destination.pk) if default_destination else None)
+        return ctx
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Config was successfully stored')
+        return HttpResponseRedirect('.')

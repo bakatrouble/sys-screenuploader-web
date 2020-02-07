@@ -1,0 +1,169 @@
+{% verbatim %}
+<h5>Global settings</h5>
+<div class="form-group row">
+    <label for="default-destination" class="col-md-3 col-form-label">Default destination</label>
+    <div class="col-md-9">
+        {{#with 'default-destination' as id, config.default_destination as value}}
+            {{>destination_select}}
+        {{/with}}
+    </div>
+</div>
+<div class="form-group row">
+    <label for="upload-screenshots" class="col-md-3 col-form-label"></label>
+    <div class="col-md-9">
+        <div class="form-check">
+            <input type="checkbox" id="upload-screenshots" class="form-check-input" checked="{{config.upload_screenshots}}">
+            <label for="upload-screenshots" class="form-check-label">Upload screenshots</label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="upload-movies" class="col-md-3 col-form-label"></label>
+    <div class="col-md-9">
+        <div class="form-check">
+            <input type="checkbox" id="upload-movies" class="form-check-input" checked="{{config.upload_movies}}">
+            <label for="upload-movies" class="form-check-label">Upload movies</label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
+    <label for="url" class="col-md-3 col-form-label">Server URL</label>
+    <div class="col-md-9">
+        <input type="url" class="form-control" value="{{config.url}}" placeholder="https://home.bakatrouble.me/upload/&lt;destid&gt;/">
+        <small class="text-muted">Do not set this value unless you setup your own server</small>
+    </div>
+</div>
+<hr>
+
+<h5>Per-title destinations overrides</h5>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title ID</th>
+        <th>Destination</th>
+        <th></th>
+    </tr>
+    </thead>
+    {{#each config.title_settings}}
+        <tr>
+            <td><input type="text" class="form-control" value="{{tid}}"></td>
+            <td>
+                {{#with destination as value}}
+                    {{>destination_select}}
+                {{/with}}
+            </td>
+            <td width="1"><button class="btn btn-danger" on-click="@this.deleteTitleSetting(@index)">Delete</button></td>
+        </tr>
+    {{/each}}
+    <tfoot>
+    <tr><td colspan="3" class="text-right">
+        <button class="btn btn-secondary" on-click="@this.addTitleSetting()">Add</button>
+    </td></tr>
+    </tfoot>
+</table>
+<hr>
+
+<h5>Per-title screenshot overrides</h5>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title ID</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    {{#each config.title_screenshots}}
+        <tr>
+            <td><input type="text" class="form-control" value="{{tid}}"></td>
+            <td>
+                <div class="form-check">
+                    <input id="upload-screenshots-{{@index}}" type="checkbox" class="form-check-input" checked="{{enabled}}">
+                    <label class="form-check-label" for="upload-screenshots-{{@index}}">Upload screenshots</label>
+                </div>
+            </td>
+            <td width="1"><button class="btn btn-danger" on-click="@this.deleteTitleScreenshots(@index)">Delete</button></td>
+        </tr>
+    {{/each}}
+    <tfoot>
+    <tr><td colspan="3" class="text-right">
+        <button class="btn btn-secondary" on-click="@this.addTitleScreenshots()">Add</button>
+    </td></tr>
+    </tfoot>
+</table>
+<hr>
+
+<h5>Per-title movie overrides</h5>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title ID</th>
+        <th></th>
+        <th></th>
+    </tr>
+    </thead>
+    {{#each config.title_movies}}
+        <tr>
+            <td><input type="text" class="form-control" value="{{tid}}"></td>
+            <td>
+                <div class="form-check">
+                    <input id="upload-movies-{{@index}}" type="checkbox" class="form-check-input" checked="{{enabled}}">
+                    <label class="form-check-label" for="upload-movies-{{@index}}">Upload movies</label>
+                </div>
+            </td>
+            <td width="1"><button class="btn btn-danger" on-click="@this.deleteTitleMovies(@index)">Delete</button></td>
+        </tr>
+    {{/each}}
+    <tfoot>
+    <tr><td colspan="3" class="text-right">
+        <button class="btn btn-secondary" on-click="@this.addTitleMovies()">Add</button>
+    </td></tr>
+    </tfoot>
+</table>
+<hr>
+
+<button class="btn btn-outline-primary btn-sm float-right" id="js-config-clipboard">Copy</button>
+<h5>Result</h5>
+<pre id="rendered-config" class="language-ini"></pre>
+<pre id="config" style="display: none" as-hljs="'#rendered-config'">
+[server]
+default_destination = {{destinations[config.default_destination].slug}}
+
+; change following values to false to disable according media type
+upload_screenshots = {{#if config.upload_screenshots}}true{{else}}false{{/if}}
+upload_movies = {{#if config.upload_movies}}true{{else}}false{{/if}}
+
+{{#if config.url}}url = {{config.url}}{{else}}; url = https://home.bakatrouble.me/upload/&lt;destid&gt;/{{/if}}
+; do not change previous line unless you setup your own server!
+
+[title_settings]
+; example: use destination "discord" for title ID DB1426D1DFD034027CECDE9C2DD914B8 (Album)
+; title ID is a second part of capture filename
+; DB1426D1DFD034027CECDE9C2DD914B8 = discord{{#each config.title_settings}}{{#if tid && destination}}
+{{tid}} = {{destinations[destination].slug}}{{/if}}{{/each}}
+
+[title_screenshots]
+; example: do not upload screenshots for title ID DB1426D1DFD034027CECDE9C2DD914B8 (Album)
+; DB1426D1DFD034027CECDE9C2DD914B8 = false{{#each config.title_screenshots}}{{#if tid}}
+{{tid}} = {{#if enabled}}true{{else}}false{{/if}}{{/if}}{{/each}}
+
+[title_movies]
+; example: do not upload movies for title ID DB1426D1DFD034027CECDE9C2DD914B8 (Album)
+; DB1426D1DFD034027CECDE9C2DD914B8 = false{{#each config.title_movies}}{{#if tid}}
+{{tid}} = {{#if enabled}}true{{else}}false{{/if}}{{/if}}{{/each}}
+
+[destinations]
+{{#each destinations}}
+{{slug}} = {{@key}}
+{{/each}}
+</pre>
+
+
+{{#partial destination_select}}
+    <select class="form-control" id="{{id}}" value="{{value}}">
+        {{#each destinations}}
+            <option value="{{@key}}">{{title}}</option>
+        {{/each}}
+    </select>
+{{/partial}}
+
+{% endverbatim %}

@@ -1,0 +1,60 @@
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Config builder{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <section class="card">
+            <header class="card-header">
+                <h2 class="card-title">Config builder</h2>
+            </header>
+            <div class="card-body">
+                <div id="tpl-root"></div>
+            </div>
+            <form action="" class="card-footer text-right" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="saved_config" id="config-input" value="{{ request.user.saved_config }}">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </form>
+        </section>
+    </div>
+{% endblock %}
+
+{% block body_extra %}
+    <script>
+        var destinations = {{ destinations | safe }};
+        var default_destination = {{ default_destination | safe }};
+    </script>
+    <script type="text/ractive" id="tpl">
+        {% include 'cabinet/configuration_form.hbs' %}
+    </script>
+    <script src="{% static 'config.js' %}"></script>
+    <script data-turbolinks-eval="false">
+        (function() {
+            var clipboard = new ClipboardJS('#js-config-clipboard', {
+                text: function () {
+                    return $('#config').html();
+                }
+            });
+            clipboard.on('success', function() {
+                var el = $('#js-config-clipboard').popover({
+                    content: 'Copied',
+                    trigger: 'manual',
+                    placement: 'bottom',
+                }).popover('show');
+                setTimeout(function() { el.popover('hide') }, 2000);
+                setTimeout(function() { el.popover('dispose') }, 3000);
+            });
+            clipboard.on('error', function() {
+                var el = $('#js-config-clipboard').popover({
+                    content: 'Cannot copy',
+                    trigger: 'manual',
+                    placement: 'bottom',
+                }).popover('show');
+                setTimeout(function() { el.popover('hide') }, 2000);
+                setTimeout(function() { el.popover('dispose') }, 3000);
+            });
+        })();
+    </script>
+{% endblock %}

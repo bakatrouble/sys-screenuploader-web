@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/cyborg.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/font-awesome/css/fontawesome-all.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/magnific-popup/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/highlightjs/styles/tomorrow-night.css' %}">
     <link rel="stylesheet" href="{% static 'app.css' %}">
 
     <script src="{% static 'vendor/modernizr/modernizr.js' %}"></script>
@@ -27,6 +28,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
                 {% if request.user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'configuration' %}">Config builder</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'destination_list' %}">Destination list</a>
                     </li>
@@ -66,6 +70,9 @@
 <script data-turbolinks-eval="false" src="{% static 'vendor/popper/umd/popper.min.js' %}"></script>
 <script data-turbolinks-eval="false" src="{% static 'vendor/bootstrap/js/bootstrap.js' %}"></script>
 <script data-turbolinks-eval="false" src="{% static 'vendor/magnific-popup/jquery.magnific-popup.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/highlightjs/highlight.pack.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/ractive/ractive.js' %}"></script>
+<script data-turbolinks-eval="false" src="{% static 'vendor/clipboardjs/clipboard.min.js' %}"></script>
 <script data-turbolinks-eval="false" src="{% static 'app.js' %}"></script>
 <script src="{% static 'app.init.js' %}"></script>
 {% block body_extra %}{% endblock %}

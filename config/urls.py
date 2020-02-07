@@ -5,8 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView, TemplateView
 
 from app.views import LoginView, SignupView, DestinationListView, DestinationCreateView, DestinationEditView, \
-    DestinationDeleteView, UploadView, DestinationHistoryView
-
+    DestinationDeleteView, UploadView, DestinationHistoryView, ConfigurationView
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
@@ -19,6 +18,7 @@ urlpatterns = [
     path('cabinet/destinations/<uuid:pk>/', DestinationHistoryView.as_view(), name='destination_history'),
     path('cabinet/destinations/<uuid:pk>/edit/', DestinationEditView.as_view(), name='destination_edit'),
     path('cabinet/destinations/<uuid:pk>/delete/', DestinationDeleteView.as_view(), name='destination_delete'),
+    path('cabinet/configuration/', ConfigurationView.as_view(), name='configuration'),
     path('upload/<uuid:destination_id>/', csrf_exempt(UploadView.as_view()), name='upload'),
     path('admin/', admin.site.urls, name='admin'),
 ]
