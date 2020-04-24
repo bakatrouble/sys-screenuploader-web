@@ -53,5 +53,29 @@
             For logs see <code>/config/sys-screenuploader/screenuploader.log</code>
         </p>
 
+        <hr>
+
+        <h4>FAQ</h4>
+        <div class="card text-white bg-info mt-2 mb-2">
+            <div class="card-header">I can't open the log file</div>
+            <div class="card-body">
+                <div class="card-text">
+                    The log file is inaccessible while the sysmodule is running.
+                    Either stop the sysmodule (using Kosmos Toolbox or by any other means) or plug your SD card into another device.
+                </div>
+            </div>
+        </div>
+        <div class="card text-white bg-info mt-2 mb-2">
+            <div class="card-header">Media are not being sent</div>
+            <div class="card-body">
+                <div class="card-text">
+                    The sysmodule only detects newest screenshots.
+                    Check the startup messages, if they say that the latest media has a future date, congratulations!<br>
+                    This usually means that you're an Animal Crossing cheater and have took some captures "in future",
+                    and the sysmodule will only detect media with a date later than your captures from future.<br>
+                    To resolve this issue either delete all captures with a wrong date or move them outside the Album folder.
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
