@@ -10,6 +10,7 @@
             title_settings: [],
             title_screenshots: [],
             title_movies: [],
+            caption: '',
         }
     );
 
