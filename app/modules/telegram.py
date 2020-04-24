@@ -12,9 +12,18 @@ from app.models import DestinationModuleConfig, UploadedMedia
 HELP_TEXT = '''\
 <ul>
     <li>Create a bot using <a href="https://t.me/botfather" target="_blank">@botfather</a>, you will get its <b>token</b></li>
-    <li>Create a channel, add your bot to it as admin</li>
-    <li>Send a message to the channel and forward it to <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>, you will get your <b>chat ID</b> (minus sign for
-        private channels included)</li>
+    <li>Create a channel or a group and add your bot to it (as admin for channels)</li>
+    <li>
+        <b>For channels:</b> Send a message to the channel and forward it to 
+        <a href="https://t.me/getmyid_bot" target="_blank">@getmyid_bot</a>, you will get your <b>chat ID</b> 
+        (minus sign for private channels included)
+    </li>
+    <li>
+        <b>For groups:</b> Add <a href="https://t.me/getmyid_bot" target="_blank">@getmyid_bot</a> to your group and 
+        you will immediately get you <b>chat ID</b> 
+        (minus sign for private groups included)<br>
+        Now @getmyid_bot can be removed from the group
+    </li>
 </ul>
 '''
 
