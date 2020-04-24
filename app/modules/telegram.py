@@ -40,10 +40,11 @@ class DestinationModuleConfigTelegram(DestinationModuleConfig):
                     thumb = os.path.join(d, 'thumb.jpg')
                     im.save(thumb)
                     bot.send_video(self.chat_id, media_file, media.video_length,
+                                   (media.caption or '')[:128],
                                    width=media.video_width, height=media.video_height, supports_streaming=True,
                                    thumb=media.thumb.open('rb'), timeout=60)
             else:
-                bot.send_photo(self.chat_id, media_file)
+                bot.send_photo(self.chat_id, media_file, (media.caption or '')[:128])
 
     class Meta:
         verbose_name = verbose_name_plural = 'Destination module config Telegram'

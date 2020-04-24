@@ -51,7 +51,7 @@ class UploadView(JsonView):
         except Destination.DoesNotExist:
             return {'status': 'error', 'message': 'wrong destination id'}, 404
 
-        uploaded_media = UploadedMedia(destination=destination, is_video=is_video)
+        uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=request.GET.get('caption'))
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
         if is_video:

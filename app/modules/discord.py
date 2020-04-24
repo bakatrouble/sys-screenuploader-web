@@ -44,12 +44,14 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
 
         if media.is_video:
             upload_url = self.get_uploader().upload(media)
-            r = get_api_session().post(url, {'payload_json': json.dumps({'content': upload_url})},
+            content = '{}\n{}'.format(upload_url, (media.caption or '')[:128])
+            r = get_api_session().post(url, {'payload_json': json.dumps({'content': content})},
                                        files={'file': media.thumb.open('rb')})
             if r.status_code != 200:
                 raise RuntimeError(r.text)
         else:
-            r = get_api_session().post(url, files={'file': media.file.open('rb')})
+            r = get_api_session().post(url, {'payload_json': json.dumps({'content': (media.caption or '')[:128]})},
+                                       files={'file': media.file.open('rb')})
             if r.status_code != 200:
                 raise RuntimeError(r.text)
 

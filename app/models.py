@@ -57,6 +57,7 @@ class UploadedMedia(models.Model):
     video_length = models.PositiveSmallIntegerField(null=True, blank=True)
     video_width = models.PositiveSmallIntegerField(null=True, blank=True)
     video_height = models.PositiveSmallIntegerField(null=True, blank=True)
+    caption = models.TextField(null=True, blank=True)
 
     status = models.NullBooleanField()
     log = models.TextField(null=True, blank=True)
