@@ -34,7 +34,7 @@
         (function() {
             var clipboard = new ClipboardJS('#js-config-clipboard', {
                 text: function () {
-                    return $('#config').html();
+                    return $('#config').text();
                 }
             });
             clipboard.on('success', function() {
