@@ -27,16 +27,26 @@
     </div>
 </div>
 <div class="form-group row">
+    <label for="keep-logs" class="col-md-3 col-form-label"></label>
+    <div class="col-md-9">
+        <div class="form-check">
+            <input type="checkbox" id="keep-logs" class="form-check-input" checked="{{config.keep_logs}}">
+            <label for="keep-logs" class="form-check-label">Keep logs on reboot</label>
+        </div>
+    </div>
+</div>
+<div class="form-group row">
     <label for="url" class="col-md-3 col-form-label">Server URL</label>
     <div class="col-md-9">
         <input type="url" id="url" class="form-control" value="{{config.url}}" placeholder="https://home.bakatrouble.me/upload/&lt;destid&gt;/">
-        <small class="text-muted">Do not set this value unless you setup your own server</small>
+        <small>Do not set this value unless you setup your own server</small>
     </div>
 </div>
 <div class="form-group row">
     <label for="caption" class="col-md-3 col-form-label">Caption</label>
     <div class="col-md-9">
         <input type="text" id="caption" class="form-control" value="{{config.caption}}" placeholder="caption">
+        <small>Placeholders: <code>{date}</code>, <code>{time}</code>, <code>{title}</code></small>
     </div>
 </div>
 <hr>
@@ -137,6 +147,8 @@ default_destination = {{destinations[config.default_destination].slug}}
 ; change following values to false to disable according media type
 upload_screenshots = {{#if config.upload_screenshots}}true{{else}}false{{/if}}
 upload_movies = {{#if config.upload_movies}}true{{else}}false{{/if}}
+
+keep_logs = {{#if config.keep_logs}}true{{else}}false{{/if}}
 
 {{#if config.url}}url = {{config.url}}{{else}}; url = https://home.bakatrouble.me/upload/&lt;destid&gt;/{{/if}}
 ; do not change previous line unless you setup your own server!

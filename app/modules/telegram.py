@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from PIL import Image
 from django.conf import settings
 from django.db import models
-from telegram import Bot
+from telegram import Bot, MAX_CAPTION_LENGTH
 
 from app.models import DestinationModuleConfig, UploadedMedia
 
@@ -53,7 +53,7 @@ class DestinationModuleConfigTelegram(DestinationModuleConfig):
                                    width=media.video_width, height=media.video_height, supports_streaming=True,
                                    thumb=media.thumb.open('rb'), timeout=60)
             else:
-                bot.send_photo(self.chat_id, media_file, (media.caption or '')[:128])
+                bot.send_photo(self.chat_id, media_file, (media.caption or '')[:MAX_CAPTION_LENGTH])
 
     class Meta:
         verbose_name = verbose_name_plural = 'Destination module config Telegram'

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from io import BytesIO
 from tempfile import TemporaryDirectory
 
@@ -20,7 +21,7 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from users.models import User
 from .forms import LoginForm, SignupForm, ConfigForm
-from .models import Destination, UploadedMedia
+from .models import Destination, UploadedMedia, TitleEntry
 from .modules import DESTINATION_MODULES
 from .tasks import process_upload
 from .utils import BaseDestinationView
@@ -31,6 +32,14 @@ class UploadView(JsonView):
         filename = self.request.GET.get('filename')
         if not filename:
             return {'status': 'error', 'message': 'filename is missing'}, 400
+
+        m = re.match(r'(\d{16})-([\dA-F]{32})\..{3}', filename)
+        if not m:
+            return {'status': 'error', 'message': 'incorrect filename'}, 400
+
+        dt, hsh = m.groups()
+        date = f'{dt[0:4]}-{dt[4:6]}-{dt[6:8]}'
+        time = f'{dt[8:10]}:{dt[10:12]}:{dt[12:14]}'
 
         if filename.endswith('.jpg'):
             is_video = False
@@ -51,7 +60,12 @@ class UploadView(JsonView):
         except Destination.DoesNotExist:
             return {'status': 'error', 'message': 'wrong destination id'}, 404
 
-        uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=request.GET.get('caption'))
+        caption = request.GET.get('caption')
+        if caption:
+            entry = TitleEntry.objects.filter(hash=hsh).first()
+            title = entry.name if entry else '[Unknown application]'
+            caption = caption.replace('{date}', date).replace('{time}', time).replace('{title}', title)
+        uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=caption)
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
         if is_video:

@@ -6,6 +6,7 @@
             default_destination: default_destination,
             upload_screenshots: true,
             upload_movies: true,
+            keep_logs: false,
             url: '',
             title_settings: [],
             title_screenshots: [],

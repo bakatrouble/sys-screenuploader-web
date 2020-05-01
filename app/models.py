@@ -66,4 +66,12 @@ class UploadedMedia(models.Model):
         return f'#{self.pk} {self.file.name}'
 
 
+class TitleEntry(models.Model):
+    name = models.TextField()
+    hash = models.CharField(max_length=32, db_index=True)
+
+    def __str__(self):
+        return f'{self.name} [{self.hash}]'
+
+
 from .modules import DESTINATION_MODULES

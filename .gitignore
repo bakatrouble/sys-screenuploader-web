@@ -6,3 +6,5 @@ __pycache__
 !.gitkeep
 .idea
 build
+/keydump.bin
+/title_db.json
