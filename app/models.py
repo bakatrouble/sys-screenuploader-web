@@ -69,6 +69,7 @@ class UploadedMedia(models.Model):
 class TitleEntry(models.Model):
     name = models.TextField()
     hash = models.CharField(max_length=32, db_index=True)
+    custom = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} [{self.hash}]'

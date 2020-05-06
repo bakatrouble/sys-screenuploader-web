@@ -10,9 +10,9 @@ class Command(BaseCommand):
         with open('title_db.json') as f:
             data = json.load(f)
 
-        TitleEntry.objects.all().delete()
+        TitleEntry.objects.filter(custom=False).delete()
         entries = []
         for title in data:
-            entries.append(TitleEntry(name=title['name'], hash=title['hash']))
+            entries.append(TitleEntry(name=title['name'], hash=title['hash'], custom=False))
         TitleEntry.objects.bulk_create(entries)
         print(f'Created {len(entries)} entries')

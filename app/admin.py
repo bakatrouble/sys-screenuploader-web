@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path
 
-from .models import Destination, UploadedMedia, DESTINATION_MODULES
+from .models import Destination, UploadedMedia, DESTINATION_MODULES, TitleEntry
 
 
 class FixedAMA(ActionsModelAdmin):
@@ -71,3 +71,10 @@ class UploadedMediaAdmin(FixedAMA):
     def file_link(self, request, pk):
         obj = UploadedMedia.objects.get(pk=pk)
         return redirect(obj.file.url)
+
+
+@admin.register(TitleEntry)
+class TitleEntryAdmin(admin.ModelAdmin):
+    list_display = 'name', 'hash', 'custom',
+    search_fields = 'name', 'hash',
+    list_filter = 'custom',
