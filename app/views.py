@@ -20,7 +20,7 @@ from jsonview.views import JsonView
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from users.models import User
-from .forms import LoginForm, SignupForm, ConfigForm
+from .forms import LoginForm, SignupForm, ConfigForm, ChangePasswordForm
 from .models import Destination, UploadedMedia, TitleEntry
 from .modules import DESTINATION_MODULES
 from .tasks import process_upload
@@ -228,3 +228,21 @@ class ConfigurationView(LoginRequiredMixin, UpdateView):
         form.save()
         messages.success(self.request, 'Config was successfully stored')
         return HttpResponseRedirect('.')
+
+
+class ChangePasswordView(LoginRequiredMixin, FormView):
+    template_name = 'cabinet/change_password.html'
+    form_class = ChangePasswordForm
+
+    def get_form_kwargs(self):
+        kw = super().get_form_kwargs()
+        kw['user'] = self.request.user
+        return kw
+
+    def form_valid(self, form):
+        user = self.request.user
+        user.set_password(form.cleaned_data['new_password1'])
+        user.save()
+        messages.success(self.request, 'Password was successfully changed')
+        return HttpResponseRedirect('.')
+

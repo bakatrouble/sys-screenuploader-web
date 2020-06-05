@@ -44,3 +44,23 @@ class ConfigForm(ModelForm):
     class Meta:
         model = User
         fields = 'saved_config',
+
+
+class ChangePasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput())
+    new_password1 = forms.CharField(widget=forms.PasswordInput())
+    new_password2 = forms.CharField(widget=forms.PasswordInput())
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        if not self.user.check_password(self.cleaned_data['old_password']):
+            raise forms.ValidationError('Invalid old password')
+        return self.cleaned_data['old_password']
+
+    def clean(self):
+        if self.cleaned_data['new_password1'] != self.cleaned_data['new_password2']:
+            raise forms.ValidationError('Passwords do not match')
+        return self.cleaned_data
