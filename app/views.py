@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from datetime import datetime
 from io import BytesIO
 from tempfile import TemporaryDirectory
 
@@ -40,6 +41,7 @@ class UploadView(JsonView):
         dt, hsh = m.groups()
         year, month, day = dt[0:4], dt[4:6], dt[6:8]
         hour, minute, second = dt[8:10], dt[10:12], dt[12:14]
+        dt = datetime(year, month, day, hour, minute, second)
 
         if filename.endswith('.jpg'):
             is_video = False
@@ -64,22 +66,14 @@ class UploadView(JsonView):
         if caption:
             entry = TitleEntry.objects.filter(hash=hsh).first()
             title = entry.name if entry else '[Unknown application]'
-            matches = re.findall(r'{(title|date(:.*?)?|time(:.*?)?)}', caption)
-            for tag, _, _ in set(matches):
-                if tag == 'title':
-                    caption = caption.replace('{title}', title)
-                elif tag.startswith('date'):
-                    parts = tag.split(':')
-                    if len(parts) == 1:
-                        caption = caption.replace('{date}', f'{year}-{month}-{day}')
-                    else:
-                        caption = caption.replace(f'{{{tag}}}', parts[1].replace('y', year).replace('m', month).replace('d', day))
-                elif tag.startswith('time'):
-                    parts = tag.split(':')
-                    if len(parts) == 1:
-                        caption = caption.replace('{time}', f'{hour}:{minute}:{second}')
-                    else:
-                        caption = caption.replace(f'{{{tag}}}', parts[1].replace('h', hour).replace('m', minute).replace('s', second))
+            caption = caption\
+                .replace('{title}', title)\
+                .replace('{date}', dt.strftime('%Y-%m-%d'))\
+                .replace('{time}', dt.strftime('%H:%M:%S'))
+            matches = re.findall(r'{datetime:(.+)}', caption)
+            for full_tag, param in matches:
+                caption = caption.replace(full_tag, dt.strftime(param))
+
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=caption)
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
