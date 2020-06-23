@@ -38,8 +38,8 @@ class UploadView(JsonView):
             return {'status': 'error', 'message': 'incorrect filename'}, 400
 
         dt, hsh = m.groups()
-        date = f'{dt[0:4]}-{dt[4:6]}-{dt[6:8]}'
-        time = f'{dt[8:10]}:{dt[10:12]}:{dt[12:14]}'
+        year, month, day = dt[0:4], dt[4:6], dt[6:8]
+        hour, minute, second = dt[8:10], dt[10:12], dt[12:14]
 
         if filename.endswith('.jpg'):
             is_video = False
@@ -64,7 +64,22 @@ class UploadView(JsonView):
         if caption:
             entry = TitleEntry.objects.filter(hash=hsh).first()
             title = entry.name if entry else '[Unknown application]'
-            caption = caption.replace('{date}', date).replace('{time}', time).replace('{title}', title)
+            matches = re.findall(r'{(title|date(:.*?)?|time(:.*?)?)}', caption)
+            for tag, _, _ in set(matches):
+                if tag == 'title':
+                    caption = caption.replace('{title}', title)
+                elif tag.startswith('date'):
+                    parts = tag.split(':')
+                    if len(parts) == 1:
+                        caption = caption.replace('{date}', f'{year}-{month}-{day}')
+                    else:
+                        caption = caption.replace(f'{{{tag}}}', parts[1].replace('y', year).replace('m', month).replace('d', day))
+                elif tag.startswith('time'):
+                    parts = tag.split(':')
+                    if len(parts) == 1:
+                        caption = caption.replace('{time}', f'{hour}:{minute}:{second}')
+                    else:
+                        caption = caption.replace(f'{{{tag}}}', parts[1].replace('h', hour).replace('m', minute).replace('s', second))
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=caption)
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
