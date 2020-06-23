@@ -70,7 +70,7 @@ class UploadView(JsonView):
                 .replace('{title}', title)\
                 .replace('{date}', dt.strftime('%Y-%m-%d'))\
                 .replace('{time}', dt.strftime('%H:%M:%S'))
-            matches = re.findall(r'{datetime:(.+)}', caption)
+            matches = re.findall(r'{datetime:(.+?)}', caption)
             for full_tag, param in matches:
                 caption = caption.replace(full_tag, dt.strftime(param))
 
