@@ -41,7 +41,7 @@ class UploadView(JsonView):
         dt, hsh = m.groups()
         year, month, day = dt[0:4], dt[4:6], dt[6:8]
         hour, minute, second = dt[8:10], dt[10:12], dt[12:14]
-        dt = datetime(year, month, day, hour, minute, second)
+        dt = datetime(*map(int, [year, month, day, hour, minute, second]))
 
         if filename.endswith('.jpg'):
             is_video = False
