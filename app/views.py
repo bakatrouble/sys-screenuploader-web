@@ -46,6 +46,9 @@ class UploadView(JsonView):
         if filename.endswith('.jpg'):
             is_video = False
             mime = 'image/jpeg'
+        elif filename.endswith('.bmp'):
+            is_video = False
+            mime = 'image/bmp'
         elif filename.endswith('.mp4'):
             is_video = True
             mime = 'video/mp4'
