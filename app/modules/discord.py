@@ -48,8 +48,7 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
             if '?' in file_url:
                 file_url = file_url[:file_url.find('?')]
             content = '{}\n||Clip will be removed after a week||\n{}'.format(file_url, (media.caption or '')[:128])
-            r = get_api_session().post(url, {'payload_json': json.dumps({'content': content})},
-                                       files={'file': media.thumb.open('rb')})
+            r = get_api_session().post(url, {'payload_json': json.dumps({'content': content})})
             if r.status_code != 200:
                 raise RuntimeError(r.text)
         else:
