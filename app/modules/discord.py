@@ -31,7 +31,7 @@ def get_api_session():
 
 class DestinationModuleConfigDiscord(DestinationModuleConfig):
     channel_id = models.CharField(max_length=32)
-    uploader = models.CharField(max_length=32, default='streamable', choices=uploader_options)
+    # uploader = models.CharField(max_length=32, default='streamable', choices=uploader_options)
 
     MODULE_NAME = 'Discord'
     HELP_TEXT = HELP_TEXT
@@ -43,8 +43,8 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
         url = 'https://discordapp.com/api/v6/channels/{}/messages'.format(self.channel_id)
 
         if media.is_video:
-            upload_url = self.get_uploader().upload(media)
-            content = '{}\n{}'.format(upload_url, (media.caption or '')[:128])
+            # upload_url = self.get_uploader().upload(media)
+            content = '{}\n||Clip will be removed after a week||\n{}'.format(media.file.url, (media.caption or '')[:128])
             r = get_api_session().post(url, {'payload_json': json.dumps({'content': content})},
                                        files={'file': media.thumb.open('rb')})
             if r.status_code != 200:
