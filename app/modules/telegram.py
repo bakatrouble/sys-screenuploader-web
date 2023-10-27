@@ -37,7 +37,7 @@ class DestinationModuleConfigTelegram(DestinationModuleConfig):
     HELP_TEXT = HELP_TEXT
 
     def send_media(self, media: UploadedMedia):
-        media_file = media.file.open('rb') if settings.DEBUG else media.file.url
+        media_file = media.file.open('rb')  # if settings.DEBUG else media.file.url
         bot = Bot(self.bot_token)
         if self.send_as_documents:
             bot.send_document(self.chat_id, media_file, filename=media.file.name)
