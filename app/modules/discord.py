@@ -44,7 +44,10 @@ class DestinationModuleConfigDiscord(DestinationModuleConfig):
 
         if media.is_video:
             # upload_url = self.get_uploader().upload(media)
-            content = '{}\n||Clip will be removed after a week||\n{}'.format(media.file.url, (media.caption or '')[:128])
+            file_url: str = media.file.url
+            if '?' in file_url:
+                file_url = file_url[:file_url.find('?')]
+            content = '{}\n||Clip will be removed after a week||\n{}'.format(file_url, (media.caption or '')[:128])
             r = get_api_session().post(url, {'payload_json': json.dumps({'content': content})},
                                        files={'file': media.thumb.open('rb')})
             if r.status_code != 200:
