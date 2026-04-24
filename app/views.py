@@ -105,7 +105,8 @@ class UploadView(JsonView):
                 imf.name = 'im.jpg'
                 imf.seek(0)
                 im = Image.open(imf)  # type: Image.Image
-                if im.format not in ('JPEG', 'PNG'):
+                if (im.format not in ('JPEG', 'PNG') or im.animated or
+                    im.size[0] > 1920 or im.size[1] > 1080):
                     raise IOError()
             except IOError:
                 return {'status': 'error', 'message': 'invalid image file'}
