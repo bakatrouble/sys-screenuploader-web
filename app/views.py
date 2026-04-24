@@ -105,7 +105,7 @@ class UploadView(JsonView):
                 imf.name = 'im.jpg'
                 imf.seek(0)
                 im = Image.open(imf)  # type: Image.Image
-                if (im.format not in ('JPEG', 'PNG') or im.is_animated or
+                if (im.format not in ('JPEG', 'PNG') or (hasattr(im, 'is_animated') and im.is_animated) or
                     im.size[0] > 1920 or im.size[1] > 1080):
                     raise IOError()
                 buf = BytesIO()
