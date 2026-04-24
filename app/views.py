@@ -46,6 +46,9 @@ class UploadView(JsonView):
         if filename.endswith('.jpg'):
             is_video = False
             mime = 'image/jpeg'
+        elif filename.endswith('.png'):
+            is_video = False
+            mime = 'image/png'
         elif filename.endswith('.mp4'):
             is_video = True
             mime = 'video/mp4'
@@ -102,7 +105,7 @@ class UploadView(JsonView):
                 imf.name = 'im.jpg'
                 imf.seek(0)
                 im = Image.open(imf)  # type: Image.Image
-                if im.format != 'JPEG':
+                if im.format not in ('JPEG', 'PNG'):
                     raise IOError()
             except IOError:
                 return {'status': 'error', 'message': 'invalid image file'}
