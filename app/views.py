@@ -78,13 +78,13 @@ class UploadView(JsonView):
                 caption = caption.replace(full_tag, dt.strftime(param))
 
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=caption)
-        uploaded_media.file.save(filename, SimpleUploadedFile(filename, request.body, mime), save=False)
 
+        media_data = request.body
         if is_video:
             with TemporaryDirectory() as d:
                 fpath = os.path.join(d, filename)
                 with open(fpath, 'wb') as f:
-                    f.write(request.body)
+                    f.write(media_data)
                 thumb_name = filename + '.thumb.jpg'
                 thumb = os.path.join(d, thumb_name)
                 clip = VideoFileClip(fpath)
@@ -101,16 +101,21 @@ class UploadView(JsonView):
                                               SimpleUploadedFile(thumb_name, f.read(), 'image/jpeg'), save=False)
         else:
             try:
-                imf = BytesIO(request.body)
+                imf = BytesIO(media_data)
                 imf.name = 'im.jpg'
                 imf.seek(0)
                 im = Image.open(imf)  # type: Image.Image
                 if (im.format not in ('JPEG', 'PNG') or im.is_animated or
                     im.size[0] > 1920 or im.size[1] > 1080):
                     raise IOError()
+                buf = BytesIO()
+                im.convert('RGB').save(buf, format='JPEG')
+                media_data = buf.getvalue()
+
             except IOError:
                 return {'status': 'error', 'message': 'invalid image file'}
 
+        uploaded_media.file.save(filename, SimpleUploadedFile(filename, media_data, mime), save=False)
         uploaded_media.save()
         process_upload.apply_async(args=(uploaded_media.pk,), shadow=str(uploaded_media))
         return {'status': 'ok'}
