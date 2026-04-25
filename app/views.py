@@ -90,7 +90,7 @@ class UploadView(JsonView):
                 clip = VideoFileClip(fpath)
                 if clip.size != [1280, 720]:
                     clip.close()
-                    return {'status': 'error', 'message': 'invalid video file'}
+                    return {'status': 'error', 'message': 'invalid video file'}, 400
                 clip.save_frame(thumb, t=1)
                 uploaded_media.video_length = clip.duration
                 uploaded_media.video_width = clip.size[0]
@@ -113,7 +113,7 @@ class UploadView(JsonView):
                 media_data = buf.getvalue()
 
             except IOError:
-                return {'status': 'error', 'message': 'invalid image file'}
+                return {'status': 'error', 'message': 'invalid image file'}, 400
 
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, media_data, mime), save=False)
         uploaded_media.save()
