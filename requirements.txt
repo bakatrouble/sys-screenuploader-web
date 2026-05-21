@@ -37,7 +37,7 @@ jmespath==0.9.4
 kombu==4.6.7
 moviepy==1.0.1
 multidict==4.7.4
-numpy==1.18.1
+numpy==1.22.0
 oauthlib==3.1.0
 Pillow==7.0.0
 proglog==0.1.9
