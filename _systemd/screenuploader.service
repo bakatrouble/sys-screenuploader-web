@@ -8,7 +8,7 @@ Type=simple
 User=http
 Group=http
 WorkingDirectory=/srv/apps/screenuploader
-ExecStart=/srv/apps/screenuploader/venv/bin/daphne -u /tmp/screenuploader.sock config.asgi:application
+ExecStart=/srv/apps/screenuploader/venv/bin/hypercorn --bind unix:/tmp/screenuploader.sock config.asgi:application
 KillSignal=SIGINT
 
 [Install]

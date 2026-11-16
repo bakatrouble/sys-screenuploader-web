@@ -20,8 +20,8 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 
 WORKDIR /app
 
-# Build toolchain for the sdist-only locked packages (autobahn
-# and django-admin-actions are pure-python sdists built by setuptools).
+# Build toolchain for the sdist-only locked package
+# (django-admin-actions is a pure-python sdist built by setuptools).
 # Everything else installs from cp313/abi3/py3 manylinux wheels, so no
 # libpq-dev/jpeg/zlib/freetype/ffi/ssl headers are needed. Builder only —
 # none of this reaches the runtime stage.
@@ -76,4 +76,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/')"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
+CMD ["hypercorn", "--bind", "0.0.0.0:8000", "config.asgi:application"]
