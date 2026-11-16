@@ -4,7 +4,6 @@ import requests
 from django.conf import settings
 from django.db import models
 
-from app.file_upload import uploader_options, uploaders
 from app.models import DestinationModuleConfig, UploadedMedia
 
 
@@ -31,19 +30,14 @@ def get_api_session():
 
 class DestinationModuleConfigDiscord(DestinationModuleConfig):
     channel_id = models.CharField(max_length=32)
-    # uploader = models.CharField(max_length=32, default='streamable', choices=uploader_options)
 
     MODULE_NAME = 'Discord'
     HELP_TEXT = HELP_TEXT
-
-    def get_uploader(self):
-        return uploaders[self.uploader]
 
     def send_media(self, media: UploadedMedia):
         url = 'https://discordapp.com/api/v6/channels/{}/messages'.format(self.channel_id)
 
         if media.is_video:
-            # upload_url = self.get_uploader().upload(media)
             file_url: str = media.file.url
             if '?' in file_url:
                 file_url = file_url[:file_url.find('?')]
