@@ -21,14 +21,12 @@ class ProcessUploadTaskTest(LocalTestCase):
 
     def test_send_media_error_marks_status_false_and_reports(self):
         error = RuntimeError('boom')
-        with mock.patch('app.modules.group.DestinationModuleConfigGroup.send_media', side_effect=error), \
-                mock.patch('app.tasks.sentry_sdk.capture_exception') as capture:
+        with mock.patch('app.modules.group.DestinationModuleConfigGroup.send_media', side_effect=error):
             process_upload(self.media.pk)
         self.media.refresh_from_db()
         self.assertFalse(self.media.status)
         self.assertIn(repr(error), self.media.log)
         self.assertIn(str(error), self.media.log)
-        capture.assert_called_once_with()
 
     def test_missing_media_raises_does_not_exist(self):
         with self.assertRaises(UploadedMedia.DoesNotExist):

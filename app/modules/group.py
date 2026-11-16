@@ -1,7 +1,6 @@
 import traceback
 from time import sleep
 
-import sentry_sdk
 from django.db import models
 
 from ..models import DestinationModuleConfig, UploadedMedia, Destination
@@ -31,7 +30,6 @@ class DestinationModuleConfigGroup(DestinationModuleConfig):
             except Exception as e:
                 errors.append(f'Destination {dest} | {e!r}: {e!s}')
                 traceback.print_exc()
-                sentry_sdk.capture_exception()
         if errors:
             if len(errors) != self.destinations.count():
                 errors = ['Partial', ''] + errors

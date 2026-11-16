@@ -1,8 +1,6 @@
 import os
 
 import environ
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = environ.Path(__file__) - 2
 
@@ -147,7 +145,3 @@ STORAGES = {
 # runs without env vars set.
 DISCORD_BOT_TOKEN = env.str('DISCORD_BOT_TOKEN', default='') if DEBUG else env.str('DISCORD_BOT_TOKEN')
 
-sentry_sdk.init(
-    dsn=env.str('SENTRY_DSN', None),
-    integrations=[DjangoIntegration()],
-)
