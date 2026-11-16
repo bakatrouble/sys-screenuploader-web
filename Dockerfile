@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 #
-# Multi-stage build for screenuploader (Django 5.2 on Python 3.13).
+# Multi-stage build for screenuploader (Django 5.2 on Python 3.13, Alpine).
 #   builder: resolves/installs locked deps with uv into /app/.venv.
-#   runtime: slim image, non-root user, venv + code only.
+#   runtime: small image, non-root user, venv + code + ffmpeg only.
 #
 # Base tags verified 2026-11-16 via `docker manifest inspect`:
-#   python:3.13-slim-bookworm, ghcr.io/astral-sh/uv:0.13.7.
+#   python:3.13-alpine, ghcr.io/astral-sh/uv:0.13.7.
 
-ARG PYTHON_TAG=3.13-slim-bookworm
+ARG PYTHON_TAG=3.13-alpine
 ARG UV_VERSION=0.13.7
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
@@ -20,14 +20,11 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 
 WORKDIR /app
 
-# Build toolchain for the sdist-only locked package
-# (django-admin-actions is a pure-python sdist built by setuptools).
-# Everything else installs from cp313/abi3/py3 manylinux wheels, so no
-# libpq-dev/jpeg/zlib/freetype/ffi/ssl headers are needed. Builder only —
+# musl build toolchain for the packages that ship only sdists
+# (autobahn, django-admin-actions, zope-interface C extension).
+# Everything else installs from musllinux/abi3/py3 wheels. Builder only —
 # none of this reaches the runtime stage.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache build-base
 
 COPY pyproject.toml uv.lock ./
 
@@ -45,13 +42,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Non-root runtime user. Fixed uid so volume ownership is predictable.
-RUN groupadd -r -g 10001 app \
-  && useradd -r -m -u 10001 -g app -d /home/app -s /usr/sbin/nologin app
+# BusyBox tools: Alpine has no useradd/groupadd.
+RUN addgroup -S -g 10001 app \
+  && adduser -S -u 10001 -G app -h /home/app -s /sbin/nologin app
 
 # System ffmpeg provides the ffprobe/ffmpeg binaries used by app/video.py.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-  && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ffmpeg
 
 # Interpreter + locked third-party deps. No build tools, no pip, no git.
 COPY --from=builder /app/.venv /app/.venv
@@ -60,8 +56,8 @@ COPY . .
 
 # Writable dirs for collectstatic (public/static), user uploads
 # (public/uploads) and app logs; entrypoint scripts executable.
-# No apt, no system writes: docker-entrypoint.sh only waits on the DB via
-# Django, then runs migrate + collectstatic + exec "$@".
+# No package manager calls and no system writes: docker-entrypoint.sh only
+# waits on the DB via Django, then runs migrate + collectstatic + exec "$@".
 RUN mkdir -p public/static public/uploads logs \
   && chmod +x docker-entrypoint.sh manage.py \
   && chown -R app:app /app /home/app
