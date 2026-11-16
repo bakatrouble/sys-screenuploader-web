@@ -1,10 +1,12 @@
+import asyncio
 import os
 from tempfile import TemporaryDirectory
 
 from PIL import Image
 from django.conf import settings
 from django.db import models
-from telegram import Bot, MAX_CAPTION_LENGTH
+from telegram import Bot
+from telegram.constants import MessageLimit
 
 from app.models import DestinationModuleConfig, UploadedMedia
 
@@ -38,22 +40,37 @@ class DestinationModuleConfigTelegram(DestinationModuleConfig):
 
     def send_media(self, media: UploadedMedia):
         media_file = media.file.open('rb')  # if settings.DEBUG else media.file.url
-        bot = Bot(self.bot_token)
-        if self.send_as_documents:
-            bot.send_document(self.chat_id, media_file, filename=media.file.name)
-        else:
-            if media.is_video:
-                im = Image.open(media.thumb)
-                im.thumbnail((320, 320), Image.ANTIALIAS)
-                with TemporaryDirectory() as d:
-                    thumb = os.path.join(d, 'thumb.jpg')
-                    im.save(thumb)
-                    bot.send_video(self.chat_id, media_file, media.video_length,
-                                   (media.caption or '')[:128],
-                                   width=media.video_width, height=media.video_height, supports_streaming=True,
-                                   thumb=media.thumb.open('rb'), timeout=60)
-            else:
-                bot.send_photo(self.chat_id, media_file, (media.caption or '')[:MAX_CAPTION_LENGTH])
+
+        async def _send():
+            bot = Bot(self.bot_token)
+            await bot.initialize()
+            try:
+                if self.send_as_documents:
+                    await bot.send_document(self.chat_id, media_file, filename=media.file.name)
+                else:
+                    if media.is_video:
+                        im = Image.open(media.thumb)
+                        im.thumbnail((320, 320), Image.LANCZOS)
+                        with TemporaryDirectory() as d:
+                            thumb = os.path.join(d, 'thumb.jpg')
+                            im.save(thumb)
+                            await bot.send_video(
+                                self.chat_id, media_file, media.video_length,
+                                (media.caption or '')[:128],
+                                width=media.video_width, height=media.video_height,
+                                supports_streaming=True,
+                                thumbnail=media.thumb.open('rb'),
+                                read_timeout=60, write_timeout=60)
+                    else:
+                        await bot.send_photo(
+                            self.chat_id, media_file,
+                            (media.caption or '')[:MessageLimit.CAPTION_LENGTH])
+            finally:
+                await bot.shutdown()
+
+        # The caller is a synchronous Celery task running in a prefork worker
+        # with no running event loop, so a fresh loop per call is safe.
+        asyncio.run(_send())
 
     class Meta:
         verbose_name = verbose_name_plural = 'Destination module config Telegram'
