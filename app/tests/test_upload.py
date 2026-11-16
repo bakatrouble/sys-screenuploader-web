@@ -3,7 +3,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-import unittest
 from unittest import mock
 
 from PIL import Image
@@ -15,6 +14,7 @@ from app.tests import (
     make_jpeg_bytes, make_png_bytes, make_user,
     upload_filename, upload_url,
 )
+from app.video import VideoProbeError, probe
 
 
 def parse_json(response):
@@ -162,7 +162,6 @@ class UploadViewTest(LocalTestCase):
         self.assertEqual(UploadedMedia.objects.get().caption, 'Year 2020')
 
 
-@unittest.skipUnless(shutil.which('ffmpeg'), 'ffmpeg not on PATH')
 class VideoUploadTest(LocalTestCase):
     @classmethod
     def setUpClass(cls):
@@ -212,3 +211,29 @@ class VideoUploadTest(LocalTestCase):
         self.assertEqual(parse_json(response)['message'], 'invalid video file')
         self.assertEqual(UploadedMedia.objects.count(), 0)
         apply_async.assert_not_called()
+
+    def test_non_video_bytes_with_mp4_name_rejected(self):
+        with mock.patch('app.views.process_upload.apply_async') as apply_async:
+            url = upload_url(self.destination.pk, upload_filename(ext='mp4'))
+            response = self.client.post(url, data=b'this is not a video' * 10,
+                                        content_type='application/octet-stream')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(parse_json(response)['message'], 'invalid video file')
+        self.assertEqual(UploadedMedia.objects.count(), 0)
+        apply_async.assert_not_called()
+
+
+class VideoProbeTest(LocalTestCase):
+    def test_probe_returns_width_height_duration(self):
+        video_dir = tempfile.mkdtemp(prefix='screenuploader-probe-')
+        self.addCleanup(shutil.rmtree, video_dir, True)
+        path = os.path.join(video_dir, 'probe.mp4')
+        VideoUploadTest._make_video(path, '1280x720')
+        width, height, duration = probe(path)
+        self.assertEqual(width, 1280)
+        self.assertEqual(height, 720)
+        self.assertAlmostEqual(duration, 2.0, delta=0.2)
+
+    def test_probe_invalid_file_raises(self):
+        with self.assertRaises(VideoProbeError):
+            probe('/dev/null')

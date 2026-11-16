@@ -18,7 +18,6 @@ from django.utils.text import slugify
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from users.models import User
 from .forms import LoginForm, SignupForm, ConfigForm, ChangePasswordForm
@@ -26,6 +25,7 @@ from .models import Destination, UploadedMedia, TitleEntry
 from .modules import DESTINATION_MODULES
 from .tasks import process_upload
 from .utils import BaseDestinationView
+from .video import VideoProbeError, extract_frame, probe
 
 
 class UploadView(View):
@@ -87,15 +87,19 @@ class UploadView(View):
                     f.write(media_data)
                 thumb_name = filename + '.thumb.jpg'
                 thumb = os.path.join(d, thumb_name)
-                clip = VideoFileClip(fpath)
-                if clip.size != [1280, 720]:
-                    clip.close()
+                try:
+                    width, height, duration = probe(fpath)
+                except VideoProbeError:
                     return JsonResponse({'status': 'error', 'message': 'invalid video file'}, status=400)
-                clip.save_frame(thumb, t=1)
-                uploaded_media.video_length = clip.duration
-                uploaded_media.video_width = clip.size[0]
-                uploaded_media.video_height = clip.size[1]
-                clip.close()
+                if (width, height) != (1280, 720):
+                    return JsonResponse({'status': 'error', 'message': 'invalid video file'}, status=400)
+                try:
+                    extract_frame(fpath, thumb, at_seconds=1)
+                except VideoProbeError:
+                    return JsonResponse({'status': 'error', 'message': 'invalid video file'}, status=400)
+                uploaded_media.video_length = duration
+                uploaded_media.video_width = width
+                uploaded_media.video_height = height
                 with open(thumb, 'rb') as f:
                     uploaded_media.thumb.save(thumb_name,
                                               SimpleUploadedFile(thumb_name, f.read(), 'image/jpeg'), save=False)

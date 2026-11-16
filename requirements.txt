@@ -85,8 +85,6 @@ click-plugins==1.1.1.2
     # via celery
 click-repl==0.4.1
     # via celery
-colorama==0.4.6 ; sys_platform == 'win32'
-    # via tqdm
 constantly==23.10.4
     # via
     #   screenuploader
@@ -99,10 +97,6 @@ cryptography==50.0.2
     #   service-identity
 daphne==4.1.2
     # via screenuploader
-decorator==4.4.1
-    # via
-    #   moviepy
-    #   screenuploader
 discord-py==2.7.1
     # via screenuploader
 django==5.2.19
@@ -155,14 +149,6 @@ idna==3.6
     #   screenuploader
     #   twisted
     #   yarl
-imageio==2.34.1
-    # via
-    #   moviepy
-    #   screenuploader
-imageio-ffmpeg==0.5.1
-    # via
-    #   moviepy
-    #   screenuploader
 incremental==24.7.0
     # via
     #   screenuploader
@@ -176,26 +162,13 @@ kombu==5.3.7
     # via
     #   celery
     #   screenuploader
-moviepy==1.0.3
-    # via screenuploader
 multidict==7.2.1
     # via
     #   aiohttp
     #   screenuploader
     #   yarl
-numpy==2.5.5
-    # via
-    #   imageio
-    #   moviepy
-    #   screenuploader
 pillow==13.0.0
-    # via
-    #   imageio
-    #   screenuploader
-proglog==0.1.10
-    # via
-    #   moviepy
-    #   screenuploader
+    # via screenuploader
 prompt-toolkit==3.0.53
     # via click-repl
 propcache==0.5.4
@@ -241,9 +214,7 @@ redis==5.0.1
     #   django-redis
     #   screenuploader
 requests==2.31.0
-    # via
-    #   moviepy
-    #   screenuploader
+    # via screenuploader
 s3transfer==0.9.0
     # via
     #   boto3
@@ -258,7 +229,6 @@ setuptools==84.2.1
     # via
     #   apscheduler
     #   autobahn
-    #   imageio-ffmpeg
     #   incremental
 six==1.17.0
     # via
@@ -275,11 +245,6 @@ sqlparse==0.5.5
     #   screenuploader
 tornado==6.6.1
     # via screenuploader
-tqdm==4.66.2
-    # via
-    #   moviepy
-    #   proglog
-    #   screenuploader
 twisted==24.11.0
     # via
     #   daphne

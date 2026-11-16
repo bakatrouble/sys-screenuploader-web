@@ -20,7 +20,7 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 
 WORKDIR /app
 
-# Build toolchain for the sdist-only locked packages (autobahn, moviepy
+# Build toolchain for the sdist-only locked packages (autobahn
 # and django-admin-actions are pure-python sdists built by setuptools).
 # Everything else installs from cp313/abi3/py3 manylinux wheels, so no
 # libpq-dev/jpeg/zlib/freetype/ffi/ssl headers are needed. Builder only —
@@ -47,6 +47,11 @@ WORKDIR /app
 # Non-root runtime user. Fixed uid so volume ownership is predictable.
 RUN groupadd -r -g 10001 app \
   && useradd -r -m -u 10001 -g app -d /home/app -s /usr/sbin/nologin app
+
+# System ffmpeg provides the ffprobe/ffmpeg binaries used by app/video.py.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+  && rm -rf /var/lib/apt/lists/*
 
 # Interpreter + locked third-party deps. No build tools, no pip, no git.
 COPY --from=builder /app/.venv /app/.venv
