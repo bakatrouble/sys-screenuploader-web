@@ -20,6 +20,6 @@ urlpatterns = [
     path('cabinet/destinations/<uuid:pk>/edit/', DestinationEditView.as_view(), name='destination_edit'),
     path('cabinet/destinations/<uuid:pk>/delete/', DestinationDeleteView.as_view(), name='destination_delete'),
     path('cabinet/configuration/', ConfigurationView.as_view(), name='configuration'),
-    path('upload/<uuid:destination_id>/', csrf_exempt(UploadView.as_view()), name='upload'),
+    path('upload/<str:destination_id>/', csrf_exempt(UploadView.as_view()), name='upload'),
     path('admin/', admin.site.urls, name='admin'),
 ]

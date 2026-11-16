@@ -9,6 +9,7 @@ from PIL import Image
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpRequest, HttpResponseRedirect, Http404, JsonResponse
 from django.contrib.auth.views import LoginView as BaseLoginView
@@ -61,7 +62,7 @@ class UploadView(View):
                     raise Destination.DoesNotExist
             else:
                 destination = Destination.objects.get(pk=self.kwargs['destination_id'])
-        except Destination.DoesNotExist:
+        except (Destination.DoesNotExist, ValidationError):
             return JsonResponse({'status': 'error', 'message': 'wrong destination id'}, status=404)
 
         caption = request.GET.get('caption')

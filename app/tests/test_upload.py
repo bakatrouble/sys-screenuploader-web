@@ -72,12 +72,13 @@ class UploadViewTest(LocalTestCase):
         response = self.post_upload(upload_filename(), destination_id='undefined')
         self.assertEqual(response.status_code, 404)
 
-    @unittest.expectedFailure
+    def test_malformed_destination_returns_404(self):
+        response = self.post_upload(upload_filename(), destination_id='not-a-uuid')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(parse_json(response)['message'], 'wrong destination id')
+
     def test_undefined_destination_resolves_to_first_shared(self):
-        # BUG (config/urls.py:23): the upload path uses <uuid:destination_id>, so
-        # 'undefined' can never match and the view branch that resolves 'undefined'
-        # to the first shared destination (app/views.py:59-62) is dead code.
-        # Expected-correct behavior per the view: 200 with media on the shared dest.
+        # 'undefined' resolves to the first shared destination.
         shared = make_destination(self.user, title='Shared', shared=True)
         with mock.patch('app.views.process_upload.apply_async'):
             response = self.post_upload(upload_filename(), destination_id='undefined')
