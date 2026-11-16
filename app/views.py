@@ -73,8 +73,8 @@ class UploadView(View):
                 .replace('{date}', dt.strftime('%Y-%m-%d'))\
                 .replace('{time}', dt.strftime('%H:%M:%S'))
             matches = re.findall(r'{datetime:(.+?)}', caption)
-            for full_tag, param in matches:
-                caption = caption.replace(full_tag, dt.strftime(param))
+            for param in matches:
+                caption = caption.replace('{datetime:%s}' % param, dt.strftime(param))
 
         uploaded_media = UploadedMedia(destination=destination, is_video=is_video, caption=caption)
 

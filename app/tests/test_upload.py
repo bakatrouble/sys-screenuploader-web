@@ -153,12 +153,8 @@ class UploadViewTest(LocalTestCase):
         # DT = 20200102150405 -> 2020-01-02 15:04:05.
         self.assertEqual(UploadedMedia.objects.get().caption, '2020-01-02 15:04:05')
 
-    @unittest.expectedFailure
     def test_caption_datetime_format_substitution(self):
-        # BUG (app/views.py:77): `re.findall(r'{datetime:(.+?)}', caption)` returns a
-        # list of plain strings (single capture group), so `for full_tag, param in matches`
-        # unpacks the two characters of '%Y' into full_tag='%' and param='Y', replacing
-        # every '%' instead of the whole '{datetime:%Y}' tag.
+        # `{datetime:FORMAT}` tokens are replaced with strftime output.
         with mock.patch('app.views.process_upload.apply_async'):
             response = self.post_upload(upload_filename(), caption='Year {datetime:%Y}')
         self.assertEqual(response.status_code, 200)
