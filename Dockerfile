@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 #
-# Multi-stage build for screenuploader (Django 4.2 on Python 3.12).
+# Multi-stage build for screenuploader (Django 5.2 on Python 3.13).
 #   builder: resolves/installs locked deps with uv into /app/.venv.
 #   runtime: slim image, non-root user, venv + code only.
 #
 # Base tags verified 2026-11-16 via `docker manifest inspect`:
-#   python:3.12-slim-bookworm, ghcr.io/astral-sh/uv:0.13.7.
+#   python:3.13-slim-bookworm, ghcr.io/astral-sh/uv:0.13.7.
 
-ARG PYTHON_TAG=3.12-slim-bookworm
+ARG PYTHON_TAG=3.13-slim-bookworm
 ARG UV_VERSION=0.13.7
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
@@ -20,10 +20,9 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv
 
 WORKDIR /app
 
-# Build toolchain for the sdist-only locked packages (tornado==6.1 has
-# optional C speedups and predates cp312 wheels; autobahn, moviepy and
-# django-admin-actions are pure-python sdists built by setuptools).
-# Everything else installs from cp312/py3 manylinux wheels, so no
+# Build toolchain for the sdist-only locked packages (autobahn, moviepy
+# and django-admin-actions are pure-python sdists built by setuptools).
+# Everything else installs from cp313/abi3/py3 manylinux wheels, so no
 # libpq-dev/jpeg/zlib/freetype/ffi/ssl headers are needed. Builder only —
 # none of this reaches the runtime stage.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -33,7 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml uv.lock ./
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project --python 3.12
+    uv sync --frozen --no-dev --no-install-project --python 3.13
 
 
 FROM python:${PYTHON_TAG} AS runtime
