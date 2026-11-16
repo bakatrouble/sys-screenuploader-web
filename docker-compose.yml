@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-screenuploader}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-screenuploader}
+      POSTGRES_DB: ${POSTGRES_DB:-screenuploader}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-screenuploader}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-screenuploader}:${POSTGRES_PASSWORD:-screenuploader}@db:5432/${POSTGRES_DB:-screenuploader}
+      REDIS_URL: redis://redis:6379/1
+    volumes:
+      - staticfiles:/app/public/static
+      - mediafiles:/app/public/uploads
+      # title_db.json is built via `python manage.py import_title_db` (needs keydump.bin).
+      # Uncomment to persist it across rebuilds:
+      # - ./title_db.json:/app/title_db.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery:
+    build: .
+    restart: unless-stopped
+    command: celery worker --app=config -l info
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-screenuploader}:${POSTGRES_PASSWORD:-screenuploader}@db:5432/${POSTGRES_DB:-screenuploader}
+      REDIS_URL: redis://redis:6379/1
+    volumes:
+      - mediafiles:/app/public/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+
+  discordbot:
+    build: .
+    restart: unless-stopped
+    command: python manage.py start_discord_bot
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-screenuploader}:${POSTGRES_PASSWORD:-screenuploader}@db:5432/${POSTGRES_DB:-screenuploader}
+      REDIS_URL: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+    # Discord bot is optional: if DISCORD_BOT_TOKEN is a placeholder it will
+    # crash-loop. Either set a real token or stop it:
+    #   docker compose stop discordbot
+    profiles: ["bots"]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-screenuploader.bakatrouble.me}
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - staticfiles:/srv/static:ro
+      - mediafiles:/srv/uploads:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  redisdata:
+  staticfiles:
+  mediafiles:
+  caddy_data:
+  caddy_config:
