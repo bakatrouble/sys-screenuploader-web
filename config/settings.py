@@ -12,9 +12,12 @@ env_file = str(BASE_DIR.path('.env'))
 if os.path.exists(env_file):
     env.read_env(env_file)
 
-SECRET_KEY = env.str('SECRET_KEY', 'much_secret_wow')
-DEBUG = env.bool('DJANGO_DEBUG', True)
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*'])
+DEBUG = env.bool('DJANGO_DEBUG', False)
+# In DEBUG mode (local dev) fall back to an insecure placeholder so
+# `manage.py check/test` work with no env vars set. In production
+# (DEBUG=False) SECRET_KEY is required and startup fails without it.
+SECRET_KEY = env.str('SECRET_KEY', default='insecure-dev-key') if DEBUG else env.str('SECRET_KEY')
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 REDIS_URL = env.str('REDIS_URL', 'redis://localhost:6379/4')
 
 INSTALLED_APPS = [
@@ -69,10 +72,12 @@ DATABASES = {
 }
 # DATABASES['default']['ATOMIC_REQUESTS'] = True
 
+# Django 3.2+: keep the pre-3.2 implicit AutoField for auto-created PKs.
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 STATICFILES_DIRS = [
@@ -114,26 +119,34 @@ LOGOUT_REDIRECT_URL = 'index'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50000000
 
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_REDIRECT_EXEMPT = [r'^upload/.*']
+    SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
+    if SECURE_SSL_REDIRECT:
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+        SECURE_REDIRECT_EXEMPT = [r'^upload/.*']
 
-if not DEBUG:
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_ACCESS_KEY_ID = env.str('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = env.str('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = 'screenuploader'
+USE_S3 = env.bool('DJANGO_USE_S3', default=not DEBUG)
+if USE_S3:
+    DEFAULT_STORAGE_BACKEND = 'storages.backends.s3boto3.S3Boto3Storage'
+    # S3 credentials are required in production; in DEBUG mode they fall
+    # back to '' so `manage.py check/test` work without env vars.
+    AWS_ACCESS_KEY_ID = env.str('AWS_ACCESS_KEY_ID', default='') if DEBUG else env.str('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env.str('AWS_SECRET_ACCESS_KEY', default='') if DEBUG else env.str('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env.str('AWS_STORAGE_BUCKET_NAME', default='screenuploader')
     AWS_AUTO_CREATE_BUCKET = True
-    AWS_S3_REGION_NAME = 'eu-west-3'
+    AWS_S3_REGION_NAME = env.str('AWS_S3_REGION_NAME', default='eu-west-3')
     AWS_DEFAULT_ACL = 'public-read'
+else:
+    DEFAULT_STORAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
 
-DISCORD_BOT_TOKEN = env.str('DISCORD_BOT_TOKEN')
+STORAGES = {
+    'default': {'BACKEND': DEFAULT_STORAGE_BACKEND},
+    'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+}
 
-GFYCAT_CLIENT_ID = env.str('GFYCAT_CLIENT_ID')
-GFYCAT_SECRET = env.str('GFYCAT_SECRET')
-
-STREAMABLE_EMAIL = env.str('STREAMABLE_EMAIL')
-STREAMABLE_PASSWORD = env.str('STREAMABLE_PASSWORD')
+# Third-party integration credentials: required in production
+# (DEBUG=False); fall back to '' in DEBUG mode so local check/test
+# runs without env vars set.
+DISCORD_BOT_TOKEN = env.str('DISCORD_BOT_TOKEN', default='') if DEBUG else env.str('DISCORD_BOT_TOKEN')
 
 sentry_sdk.init(
     dsn=env.str('SENTRY_DSN', None),
