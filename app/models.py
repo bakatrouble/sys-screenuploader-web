@@ -59,7 +59,7 @@ class UploadedMedia(models.Model):
     video_height = models.PositiveSmallIntegerField(null=True, blank=True)
     caption = models.TextField(null=True, blank=True)
 
-    status = models.NullBooleanField()
+    status = models.BooleanField(null=True)
     log = models.TextField(null=True, blank=True)
 
     def __str__(self):

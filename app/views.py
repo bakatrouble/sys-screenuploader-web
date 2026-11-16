@@ -10,14 +10,13 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http import HttpRequest, HttpResponseRedirect, Http404
+from django.http import HttpRequest, HttpResponseRedirect, Http404, JsonResponse
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.text import slugify
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from jsonview.views import JsonView
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from users.models import User
@@ -28,15 +27,15 @@ from .tasks import process_upload
 from .utils import BaseDestinationView
 
 
-class UploadView(JsonView):
+class UploadView(View):
     def post(self, request: HttpRequest, *args, **kwargs):
         filename = self.request.GET.get('filename')
         if not filename:
-            return {'status': 'error', 'message': 'filename is missing'}, 400
+            return JsonResponse({'status': 'error', 'message': 'filename is missing'}, status=400)
 
         m = re.match(r'(\d{16})-([\dA-F]{32})\..{3}', filename)
         if not m:
-            return {'status': 'error', 'message': 'incorrect filename'}, 400
+            return JsonResponse({'status': 'error', 'message': 'incorrect filename'}, status=400)
 
         dt, hsh = m.groups()
         year, month, day = dt[0:4], dt[4:6], dt[6:8]
@@ -53,7 +52,7 @@ class UploadView(JsonView):
             is_video = True
             mime = 'video/mp4'
         else:
-            return {'status': 'error', 'message': 'incorrect file extension'}, 400
+            return JsonResponse({'status': 'error', 'message': 'incorrect file extension'}, status=400)
 
         try:
             if self.kwargs['destination_id'] == 'undefined':
@@ -63,7 +62,7 @@ class UploadView(JsonView):
             else:
                 destination = Destination.objects.get(pk=self.kwargs['destination_id'])
         except Destination.DoesNotExist:
-            return {'status': 'error', 'message': 'wrong destination id'}, 404
+            return JsonResponse({'status': 'error', 'message': 'wrong destination id'}, status=404)
 
         caption = request.GET.get('caption')
         if caption:
@@ -90,7 +89,7 @@ class UploadView(JsonView):
                 clip = VideoFileClip(fpath)
                 if clip.size != [1280, 720]:
                     clip.close()
-                    return {'status': 'error', 'message': 'invalid video file'}, 400
+                    return JsonResponse({'status': 'error', 'message': 'invalid video file'}, status=400)
                 clip.save_frame(thumb, t=1)
                 uploaded_media.video_length = clip.duration
                 uploaded_media.video_width = clip.size[0]
@@ -113,12 +112,12 @@ class UploadView(JsonView):
                 media_data = buf.getvalue()
 
             except IOError:
-                return {'status': 'error', 'message': 'invalid image file'}, 400
+                return JsonResponse({'status': 'error', 'message': 'invalid image file'}, status=400)
 
         uploaded_media.file.save(filename, SimpleUploadedFile(filename, media_data, mime), save=False)
         uploaded_media.save()
         process_upload.apply_async(args=(uploaded_media.pk,), shadow=str(uploaded_media))
-        return {'status': 'ok'}
+        return JsonResponse({'status': 'ok'})
 
 
 class LoginView(BaseLoginView):
