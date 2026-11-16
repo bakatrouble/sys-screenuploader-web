@@ -1,0 +1,13 @@
+# Pre-commit config — phase 0: ruff check only.
+# No ruff-format hook yet (later decision). No `pre-commit install` step
+# is added to the repo; contributors opt in by running `pre-commit install`.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Verified 2026-11-16: latest tag via
+    # `git ls-remote --tags https://github.com/astral-sh/ruff-pre-commit`
+    # (v0.17.5, matches `uvx ruff --version` => ruff 0.17.5).
+    rev: v0.17.5
+    hooks:
+      # Check only — no --fix, so hooks never rewrite code by themselves.
+      - id: ruff
+        args: [--config, ruff.toml]

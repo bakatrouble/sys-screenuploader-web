@@ -1,0 +1,20 @@
+# Ruff config — phase 0: syntax errors and pyflakes errors only.
+# No formatting, no style rules yet. That is a later decision.
+target-version = "py38"
+line-length = 120
+
+exclude = [
+  "static",
+  "public",
+  "logs",
+  "app/migrations",
+  "users/migrations",
+  # Catch-all for any vendored third-party code, should it appear later.
+  "vendor",
+  "third_party",
+  "third-party",
+]
+
+[lint]
+# E9 = syntax/parse errors, F = pyflakes (unused imports/vars, undefined names).
+select = ["E9", "F"]

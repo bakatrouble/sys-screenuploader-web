@@ -3,6 +3,7 @@ db.sqlite3
 logs/*
 *.py[co]
 __pycache__
+.ruff_cache/
 !.gitkeep
 .idea
 build
