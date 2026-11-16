@@ -64,7 +64,6 @@ certifi==2024.2.2
     #   httpx
     #   requests
     #   screenuploader
-    #   sentry-sdk
 cffi==2.1.1
     # via
     #   cryptography
@@ -219,8 +218,6 @@ s3transfer==0.9.0
     # via
     #   boto3
     #   screenuploader
-sentry-sdk==1.9.0
-    # via screenuploader
 service-identity==24.2.0
     # via
     #   screenuploader
@@ -271,7 +268,6 @@ urllib3==1.26.18
     #   botocore
     #   requests
     #   screenuploader
-    #   sentry-sdk
 vine==5.1.0
     # via
     #   amqp
