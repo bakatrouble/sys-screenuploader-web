@@ -92,11 +92,9 @@ class DiscordBotTests(LocalTestCase):
     def test_command_set_registered_without_connecting(self):
         bot = create_bot()
         self.assertEqual(bot.command_prefix, '!')
-        chatid = bot.get_command('chatid')
-        self.assertIsNotNone(chatid)
-        # dm_only() registers a check on the command.
-        self.assertTrue(chatid.checks)
-        # Only the intents the bot needs are enabled.
-        self.assertTrue(bot.intents.message_content)
+        # chatid is a slash command, so it lives on the app command tree.
+        self.assertIsNotNone(bot.tree.get_command('chatid'))
+        # No privileged intents: slash commands do not read message content.
+        self.assertFalse(bot.intents.message_content)
         self.assertFalse(bot.intents.members)
         self.assertFalse(bot.intents.presences)

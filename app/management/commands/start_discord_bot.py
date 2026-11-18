@@ -1,28 +1,29 @@
 import discord
-from discord.ext import commands
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot
 from django.conf import settings
 from django.core.management import BaseCommand
 
 
 def create_bot() -> Bot:
-    # discord.py 2.x requires explicit intents. Default intents cover
-    # guild/DM message events; message_content (privileged) is additionally
-    # needed so prefix commands such as !chatid can read message text.
-    # members/presences are not needed and stay disabled.
+    # Slash commands do not read message content, so no privileged intent is
+    # needed. Default intents are enough; members/presences stay disabled.
     intents = discord.Intents.default()
-    intents.message_content = True
     bot = Bot(command_prefix='!', intents=intents)
 
     @bot.event
     async def on_ready():
         print('Logged on as', bot.user)
+        await bot.tree.sync()
 
-    @bot.command(help='Get DM chat ID')
-    @commands.dm_only()
-    async def chatid(ctx: Context):
-        dm_channel = await ctx.author.create_dm()
-        await ctx.send(f'`{dm_channel.id}`')
+    @bot.tree.command(name='chatid', description='Get DM chat ID')
+    async def chatid(interaction: discord.Interaction):
+        if interaction.guild is not None:
+            await interaction.response.send_message(
+                'Use this command in a DM with the bot.', ephemeral=True
+            )
+            return
+        dm_channel = await interaction.user.create_dm()
+        await interaction.response.send_message(f'`{dm_channel.id}`', ephemeral=True)
 
     return bot
 

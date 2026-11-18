@@ -11,12 +11,12 @@ HELP_TEXT = '''\
 <h6>DM sending</h5>
 <ul>
     <li>Join <a href="https://discord.gg/k7YYK8b" target="_blank">my Discord server</a></li>
-    <li>Open DM with bot, send <code>!chatid</code> there, the response will contain channel ID</li>
+    <li>Open DM with bot, send <code>/chatid</code> there, the response will contain channel ID</li>
 </ul>
 
 <h6>Channel sending</h5>
 <ul>
-    <li>Add bot to the server using <a href="https://discordapp.com/api/oauth2/authorize?client_id=668958356450312192&permissions=0&scope=bot" target="_blank">this link</a></li>
+    <li>Add bot to the server using <a href="https://discord.com/oauth2/authorize?client_id=668958356450312192&permissions=0&scope=bot+applications.commands" target="_blank">this link</a></li>
     <li>Use channel ID that you can obtain from Discord interface</li>
 </ul>
 '''
